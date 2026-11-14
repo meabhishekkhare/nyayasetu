@@ -54,9 +54,6 @@
           <option value="gu" class="text-slate-900">ગુજરાતી (Gujarati)</option>
           <option value="kn" class="text-slate-900">ಕನ್ನಡ (Kannada)</option>
         </select>
-        <button id="btn-admin-link" type="button" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-slate-800 text-blue-400 hover:bg-slate-700 border border-blue-500/30 transition">
-          Admin Control
-        </button>
         <button id="btn-logout" type="button" class="hidden px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-rose-600 text-white hover:bg-rose-500 transition">
           Logout
         </button>
@@ -2080,7 +2077,6 @@
         document.getElementById('i18n-role-req').textContent = t.req;
         document.getElementById('i18n-role-adv').textContent = t.adv;
         document.getElementById('btn-enter-platform').textContent = t.enterBtn;
-        document.getElementById('btn-admin-link').textContent = t.adminBtn;
       }
 
       document.getElementById('app-lang-select').addEventListener('change', e => {
@@ -2125,13 +2121,6 @@
         session.adminAuthed = false;
         showWindow('win-auth');
         toast('Signed out');
-      });
-
-      document.getElementById('btn-admin-link').addEventListener('click', () => {
-        showWindow('win-admin');
-        document.getElementById('admin-login-box').classList.toggle('hidden', session.adminAuthed);
-        document.getElementById('admin-dashboard').classList.toggle('hidden', !session.adminAuthed);
-        if (session.adminAuthed) renderAdminDashboard();
       });
 
       // Role & Auth Tabs
