@@ -841,12 +841,10 @@
         <p id="sub-modal-badge" class="text-[11px] font-bold uppercase tracking-wider text-blue-700">Free Starter Limit Reached</p>
         <p id="sub-modal-desc" class="text-sm font-semibold text-slate-800"></p>
       </div>
-      <div class="rounded-xl border border-slate-200 p-4 bg-slate-50 space-y-2 text-xs">
-        <div class="flex items-center justify-between">
-          <span id="sub-plan-name" class="font-bold text-slate-900 text-sm">NyayaSetu Pro Plan</span>
-          <span id="sub-plan-price" class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs">₹199 / mo</span>
-        </div>
-        <p id="sub-plan-perks" class="text-slate-600"></p>
+      <div class="space-y-2">
+        <p class="text-xs font-bold text-slate-700">1. Select a Plan</p>
+        <div id="sub-plan-options" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+        <p id="sub-plan-perks" class="text-[11px] text-slate-500 pt-1"></p>
       </div>
       <div id="sub-upi-step" class="hidden rounded-xl border border-blue-200 bg-blue-50/50 p-4 space-y-3 text-xs">
         <div class="flex items-center justify-between">
@@ -1536,31 +1534,60 @@
 
     let activeSubRole = 'client';
     let activeOrderId = null;
+    let selectedPlan = null;
+
+    const SUB_PLANS = {
+      client: [
+        { id: 'client_pro_monthly', name: 'Client Pro Monthly', amountInr: 199, label: '₹199 / mo', perks: 'Unlimited case filings, full PIN/City/State advisor search & case mail.' },
+        { id: 'client_pro_annual', name: 'Client Pro Annual', amountInr: 1999, label: '₹1,999 / yr', perks: 'Save 16% — full year unlimited case filings & advisor access.' }
+      ],
+      advisor: [
+        { id: 'advisor_pro_monthly', name: 'Advisor Pro Monthly', amountInr: 499, label: '₹499 / mo', perks: 'Unlimited client contact unlocks from the case pool & direct mail.' },
+        { id: 'advisor_pro_annual', name: 'Advisor Pro Annual', amountInr: 4999, label: '₹4,999 / yr', perks: 'Save 16% — full year unlimited client contact unlocks & priority badge.' }
+      ]
+    };
+
+    function renderPlanOptions(role) {
+      const container = document.getElementById('sub-plan-options');
+      const plans = SUB_PLANS[role] || SUB_PLANS.client;
+      if (!selectedPlan || !plans.some(p => p.id === selectedPlan.id)) {
+        selectedPlan = plans[0];
+      }
+      container.innerHTML = plans.map(p => {
+        const active = selectedPlan.id === p.id;
+        return `<button type="button" data-plan-id="${p.id}" class="text-left p-3 rounded-xl border-2 transition ${active ? 'border-blue-600 bg-blue-50' : 'border-slate-200 bg-slate-50 hover:border-slate-300'}">
+          <div class="flex items-center justify-between gap-1">
+            <span class="font-bold text-slate-900 text-xs">${p.name}</span>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[11px]">${p.label}</span>
+          </div>
+        </button>`;
+      }).join('');
+      document.getElementById('sub-plan-perks').textContent = selectedPlan.perks;
+      container.querySelectorAll('[data-plan-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          selectedPlan = plans.find(p => p.id === btn.dataset.planId);
+          renderPlanOptions(role);
+        });
+      });
+    }
 
     function openSubModal(role) {
       activeSubRole = role;
       activeOrderId = null;
+      selectedPlan = null;
       const title = document.getElementById('sub-modal-title');
       const desc = document.getElementById('sub-modal-desc');
-      const planName = document.getElementById('sub-plan-name');
-      const priceEl = document.getElementById('sub-plan-price');
-      const perks = document.getElementById('sub-plan-perks');
       document.getElementById('sub-upi-step').classList.add('hidden');
       document.getElementById('sub-modal-actions').classList.remove('hidden');
       document.getElementById('sub-upi-utr').value = '';
       if (role === 'client') {
         title.textContent = 'Client Subscription Required';
-        desc.textContent = 'You have used your 1st free case lifecycle. Subscribe to raise additional cases and unlock advisors.';
-        planName.textContent = 'Client Pro Subscription';
-        priceEl.textContent = '₹199 / mo';
-        perks.textContent = 'Unlimited case filings, full PIN/City/State advisor search, and built-in case mail.';
+        desc.textContent = 'You have used your 1st free case lifecycle. Select a plan below to raise additional cases and unlock advisors.';
       } else {
         title.textContent = 'Advisor Subscription Required';
-        desc.textContent = 'You have used all 3 free client contact number unlocks from the case pool. Subscribe to unlock more contacts.';
-        planName.textContent = 'Legal Advisor Pro Subscription';
-        priceEl.textContent = '₹499 / mo';
-        perks.textContent = 'Unlimited client contact number unlocks from the open case pool and direct case mail.';
+        desc.textContent = 'You have used all 3 free client contact number unlocks. Select a plan below to unlock more contacts.';
       }
+      renderPlanOptions(role);
       document.getElementById('sub-modal').classList.remove('hidden');
     }
 
@@ -2473,8 +2500,8 @@
             body: JSON.stringify({
               userId: user.id,
               role: activeSubRole,
-              planType: activeSubRole === 'client' ? 'client_pro' : 'advisor_pro',
-              amount: activeSubRole === 'client' ? 199 : 499
+              planId: selectedPlan.id,
+              amountInr: selectedPlan.amountInr
             })
           });
           const data = await res.json();
