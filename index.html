@@ -1555,7 +1555,7 @@
 
     async function loadLiveSubPlans(role) {
       try {
-        const res = await fetch(`/api/get-rules?role=${encodeURIComponent(role)}`);
+        const res = await fetch(`/api/get-rules?role=${encodeURIComponent(role)}&_t=${Date.now()}`, { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
           const row = data.rules && data.rules[0];
