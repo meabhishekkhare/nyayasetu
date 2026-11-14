@@ -1,5 +1,5 @@
 // Vercel Serverless Function: POST /api/confirm-payment
-// Verifies a UPI / GPay UTR reference, marks payment verified, and updates user subscription status in Supabase.
+// Records the user's UPI UTR/Reference ID as 'pending' for manual Admin verification.
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -10,25 +10,13 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const {
-      txnId,
-      userId,
-      utrNumber,
-      planId,
-      credits = 0,
-      durationDays = 0,
-      scope = 'pack'
-    } = req.body || {};
+    const { txnId, userId, utrNumber } = req.body || {};
 
     if (!txnId || !userId || !utrNumber || String(utrNumber).trim().length < 6) {
       return res.status(400).json({ error: 'Valid txnId, userId, and UPI UTR/Ref number (min 6 chars) are required.' });
     }
 
-    const now = new Date();
-    const expiresAt = durationDays > 0
-      ? new Date(now.getTime() + Number(durationDays) * 24 * 3600 * 1000).toISOString()
-      : null;
-
+    const cleanUtr = String(utrNumber).trim();
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
@@ -40,49 +28,28 @@ module.exports = async function handler(req, res) {
         Authorization: `Bearer ${supabaseKey}`
       };
 
-      // 1. Mark UPI transaction verified
-      await fetch(`${base}/rest/v1/nyayasetu_upi_payments?id=eq.${encodeURIComponent(txnId)}`, {
+      const r = await fetch(`${base}/rest/v1/nyayasetu_upi_payments?id=eq.${encodeURIComponent(txnId)}`, {
         method: 'PATCH',
         headers,
         body: JSON.stringify({
-          utr_number: String(utrNumber).trim(),
-          status: 'verified',
-          verified_at: now.toISOString()
+          utr_number: cleanUtr,
+          status: 'pending'
         })
       });
-
-      // 2. Fetch current user credits and update account status
-      const userRes = await fetch(
-        `${base}/rest/v1/nyayasetu_users?id=eq.${encodeURIComponent(userId)}&select=contact_credits_remaining`,
-        { headers }
-      );
-      const userRows = userRes.ok ? await userRes.json() : [];
-      const currentCredits = (userRows[0] && Number(userRows[0].contact_credits_remaining)) || 0;
-      const updatedCredits = scope.includes('unlimited') ? 999999 : currentCredits + Number(credits || 0);
-
-      await fetch(`${base}/rest/v1/nyayasetu_users?id=eq.${encodeURIComponent(userId)}`, {
-        method: 'PATCH',
-        headers,
-        body: JSON.stringify({
-          subscription_plan: planId || 'paid_plan',
-          subscription_scope: scope,
-          contact_credits_remaining: updatedCredits,
-          subscription_expires_at: expiresAt
-        })
-      });
+      if (!r.ok) {
+        const errData = await r.json().catch(() => ({}));
+        return res.status(r.status).json({ error: errData.message || 'Failed to record UTR' });
+      }
     }
 
     return res.status(200).json({
       ok: true,
       txnId,
-      utrNumber: String(utrNumber).trim(),
-      status: 'verified',
-      subscriptionPlan: planId,
-      subscriptionScope: scope,
-      addedCredits: Number(credits || 0),
-      expiresAt
+      utrNumber: cleanUtr,
+      status: 'pending',
+      message: 'UTR submitted for admin verification.'
     });
   } catch (err) {
-    return res.status(500).json({ error: err.message || 'Payment verification failed' });
+    return res.status(500).json({ error: err.message || 'Failed to submit UTR' });
   }
-}
+};

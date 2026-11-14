@@ -859,7 +859,7 @@
           <label class="block font-semibold text-slate-700">Enter 12-digit UPI / UTR Reference ID *</label>
           <input id="sub-upi-utr" type="text" placeholder="e.g. 431912345678" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs" />
         </div>
-        <button id="btn-confirm-upi" type="button" class="w-full px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-500">Verify UTR &amp; Activate Pro</button>
+        <button id="btn-confirm-upi" type="button" class="w-full px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-500">Submit UTR for Verification</button>
       </div>
       <div id="sub-modal-actions" class="flex justify-end gap-2">
         <button id="btn-cancel-sub" type="button" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">Close</button>
@@ -2596,17 +2596,25 @@
           });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || 'Payment confirmation failed');
-          const user = db.users.find(u => u.id === session.userId);
-          if (user) { user.subscriptionPlan = 'pro'; saveDB(); }
+          if (Array.isArray(db.payments)) {
+            db.payments.unshift({
+              id: activeOrderId,
+              userId: session.userId,
+              utr: utr,
+              status: 'pending',
+              createdAt: Date.now()
+            });
+            saveDB();
+          }
           document.getElementById('sub-modal').classList.add('hidden');
           if (activeSubRole === 'client') renderClientSubBanner();
           else renderAdvisorPortal();
-          toast('Payment verified & plan activated!');
+          toast('UTR submitted! Pending admin verification.');
         } catch (err) {
           toast(err.message || 'Verification failed');
         } finally {
           btn.disabled = false;
-          btn.textContent = 'Verify UTR & Activate Pro';
+          btn.textContent = 'Submit UTR for Verification';
         }
       });
       document.getElementById('adv-pool-filter').addEventListener('input', () => {
