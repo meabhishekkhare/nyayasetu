@@ -938,5 +938,34 @@
     })();
   </script>
 
+
+  <script>
+    (function () {
+      async function syncRoleToApi(role) {
+        setTimeout(async () => {
+          try {
+            const rule = typeof db !== 'undefined' && db.subscriptionRules && db.subscriptionRules[role];
+            if (!rule) return;
+            const res = await fetch('/api/save-rules', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                role,
+                freeContacts: rule.freeContacts,
+                pushAfterContacts: rule.pushAfterContacts,
+                plans: rule.plans
+              })
+            });
+            const data = await res.json();
+            if (res.ok && typeof toast === 'function') toast('Live app rules synced (' + role + ')!');
+            else if (!res.ok && typeof toast === 'function') toast('Sync error: ' + (data.error || 'failed'));
+          } catch (e) {}
+        }, 150);
+      }
+      document.getElementById('btn-save-client-rules')?.addEventListener('click', () => syncRoleToApi('client'));
+      document.getElementById('btn-save-advisor-rules')?.addEventListener('click', () => syncRoleToApi('advisor'));
+    })();
+  </script>
+
 </body>
 </html>
