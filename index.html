@@ -2371,12 +2371,41 @@
         toast('Suggested subject & law populated');
       });
 
+      function hasActiveSubscription(u) {
+        if (!u) return false;
+        const plan = u.subscriptionPlan;
+        const notExpired = !u.subscriptionExpiresAt || new Date(u.subscriptionExpiresAt) > new Date();
+        const hasPaidPlan = plan && plan !== 'free_starter' && notExpired;
+        const hasCredits = Number(u.contactCreditsRemaining || 0) > 0;
+        return Boolean(hasPaidPlan || hasCredits);
+      }
+
+      async function syncLiveUserSubscription() {
+        try {
+          if (!session || !session.userId) return;
+          const res = await fetch('/api/user-status?userId=' + encodeURIComponent(session.userId) + '&_t=' + Date.now(), { cache: 'no-store' });
+          const data = await res.json();
+          if (data && data.ok && data.user) {
+            const u = db.users.find(x => x.id === session.userId);
+            if (u) {
+              u.subscriptionPlan = data.user.subscription_plan || u.subscriptionPlan;
+              u.subscriptionScope = data.user.subscription_scope || u.subscriptionScope;
+              u.contactCreditsRemaining = data.user.contact_credits_remaining ?? u.contactCreditsRemaining;
+              u.subscriptionExpiresAt = data.user.subscription_expires_at || u.subscriptionExpiresAt;
+              saveDB();
+              if (typeof renderClientSubBanner === 'function') renderClientSubBanner();
+              if (typeof renderAdvisorPortal === 'function' && u.role === 'advisor') renderAdvisorPortal();
+            }
+          }
+        } catch (_) {}
+      }
+
       // Submit New Case
       document.getElementById('form-new-case').addEventListener('submit', e => {
         e.preventDefault();
         const user = db.users.find(u => u.id === session.userId);
         const existingCases = db.cases.filter(c => c.clientId === user.id);
-        if (existingCases.length >= 1 && user.subscriptionPlan !== 'pro') {
+        if (existingCases.length >= 1 && !hasActiveSubscription(user)) {
           openSubModal('client');
           return;
         }
@@ -2468,7 +2497,7 @@
           const adv = db.users.find(u => u.id === session.userId);
           if (!adv) return;
           const unlocked = getAdvisorUnlockedCaseIds(adv.id);
-          if (!unlocked.includes(caseId) && unlocked.length >= 3 && adv.subscriptionPlan !== 'pro') {
+          if (!unlocked.includes(caseId) && unlocked.length >= 3 && !hasActiveSubscription(adv)) {
             openSubModal('advisor');
             return;
           }
@@ -2568,7 +2597,7 @@
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || 'Payment confirmation failed');
           const user = db.users.find(u => u.id === session.userId);
-          if (user) { user.subscriptionPlan = 'pro'; saveDb(); }
+          if (user) { user.subscriptionPlan = 'pro'; saveDB(); }
           document.getElementById('sub-modal').classList.add('hidden');
           if (activeSubRole === 'client') renderClientSubBanner();
           else renderAdvisorPortal();
@@ -2753,6 +2782,15 @@ create policy "public_rw" on nyayasetu_store for all using (true) with check (tr
         renderAdminDashboard();
         toast('Demo database reset');
       });
+    });
+  </script>
+  <footer class="max-w-6xl mx-auto px-4 py-6 mt-8 border-t border-slate-200 text-center text-[11px] text-slate-500 space-y-1">
+    <p class="font-semibold text-slate-600">NyayaSetu Legal Directory &amp; Case Intake Platform</p>
+    <p>Informational directory only — no solicitation or advertisement of legal services under Bar Council of India Rule 36. Payments are verified via UPI / UTR.</p>
+  </footer>
+  <script>
+    window.addEventListener('load', () => {
+      if (typeof syncLiveUserSubscription === 'function') syncLiveUserSubscription();
     });
   </script>
 </body>
