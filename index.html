@@ -1555,16 +1555,12 @@
 
     async function loadLiveSubPlans(role) {
       try {
-        if (cloudCfg && cloudCfg.url && cloudCfg.key && cloudCfg.provider === 'supabase') {
-          const base = cloudCfg.url.replace(/\/+$/, '');
-          const res = await fetch(`${base}/rest/v1/nyayasetu_subscription_rules?role=eq.${encodeURIComponent(role)}&select=plans`, {
-            headers: { apikey: cloudCfg.key, Authorization: `Bearer ${cloudCfg.key}` }
-          });
-          if (res.ok) {
-            const rows = await res.json();
-            if (rows[0] && Array.isArray(rows[0].plans) && rows[0].plans.length) {
-              liveSubPlans[role] = rows[0].plans;
-            }
+        const res = await fetch(`/api/get-rules?role=${encodeURIComponent(role)}`);
+        if (res.ok) {
+          const data = await res.json();
+          const row = data.rules && data.rules[0];
+          if (row && Array.isArray(row.plans) && row.plans.length) {
+            liveSubPlans[role] = row.plans;
           }
         }
       } catch (e) {}
