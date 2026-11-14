@@ -70,6 +70,7 @@
           <button type="button" data-admin-tab="verification" class="admin-tab-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">Advisor Verification</button>
           <button type="button" data-admin-tab="subscriptions" class="admin-tab-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">Subscription Rules &amp; UPI</button>
           <button type="button" data-admin-tab="payments" class="admin-tab-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">UPI Payments</button>
+          <button type="button" data-admin-tab="utr" class="admin-tab-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">UTR Verification</button>
           <button type="button" data-admin-tab="database" class="admin-tab-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">Cloud DB &amp; Security</button>
         </div>
         <div class="flex flex-wrap gap-2">
@@ -264,6 +265,24 @@
           </form>
         </div>
       </div>
+
+      <!-- TAB 6: UTR VERIFICATION -->
+      <div id="tab-utr" class="admin-tab-panel hidden space-y-4">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">UTR Verification &amp; Auto-Activation</h3>
+              <p class="text-xs text-slate-500">Toggle UTR verification ON to confirm payment and automatically enable the user's subscription plan.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <input id="utr-search" type="text" placeholder="Search Txn ID, UTR, or User ID..." class="px-3 py-1.5 rounded-xl border border-slate-300 text-xs" />
+              <button id="btn-refresh-utr" type="button" class="px-3 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800">Refresh Ledger</button>
+            </div>
+          </div>
+          <div id="utr-ledger-list" class="overflow-x-auto text-xs text-slate-600">Loading UPI transactions...</div>
+        </div>
+      </div>
+
     </section>
   </main>
 
@@ -440,6 +459,7 @@
       });
       if (tab === 'overview') renderOverview();
       if (tab === 'verification') renderAdvisorVerification();
+      if (tab === 'utr' && window.fetchUtrLedger) window.fetchUtrLedger();
       if (tab === 'subscriptions') renderSubscriptionEditor();
       if (tab === 'payments') renderPaymentsTable();
       if (tab === 'database') loadSecurityForm();
@@ -864,80 +884,6 @@
     });
   </script>
 
-  <!-- MANUAL UTR / REFERENCE ID VERIFICATION PANEL -->
-  <section id="admin-utr-panel" class="max-w-6xl mx-auto px-4 py-6">
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
-      <div class="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h2 class="text-base font-bold text-slate-900">Manual UPI / UTR Reference Verification</h2>
-          <p class="text-xs text-slate-500">Review UPI transactions by Txn ID or 12-digit UTR and manually Approve (activates user plan) or Reject.</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <input id="utr-search" type="text" placeholder="Search Txn ID, UTR, or User ID..." class="px-3 py-1.5 rounded-xl border border-slate-300 text-xs" />
-          <button id="btn-refresh-utr" type="button" class="px-3 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800">Refresh Ledger</button>
-        </div>
-      </div>
-      <div id="utr-ledger-list" class="overflow-x-auto text-xs text-slate-600">Loading UPI transactions...</div>
-    </div>
-  </section>
-  <script>
-    (function () {
-      let cachedPayments = [];
-      async function fetchUtrLedger() {
-        const box = document.getElementById('utr-ledger-list');
-        try {
-          const res = await fetch('/api/admin-verify-payment');
-          const data = await res.json();
-          cachedPayments = data.payments || [];
-          renderUtrLedger();
-        } catch (e) {
-          box.innerHTML = '<p class="text-rose-600">Could not load UPI ledger.</p>';
-        }
-      }
-      function renderUtrLedger() {
-        const box = document.getElementById('utr-ledger-list');
-        const q = (document.getElementById('utr-search').value || '').toLowerCase();
-        const rows = cachedPayments.filter(p =>
-          !q || (p.id || '').toLowerCase().includes(q) || (p.utr_number || '').toLowerCase().includes(q) || (p.user_id || '').toLowerCase().includes(q)
-        );
-        if (!rows.length) {
-          box.innerHTML = '<p class="text-slate-400 py-3">No matching UPI transactions found.</p>';
-          return;
-        }
-        box.innerHTML = `<table class="w-full text-left border-collapse">
-          <thead><tr class="border-b border-slate-200 text-slate-500">
-            <th class="py-2 pr-3">Txn ID</th><th class="py-2 pr-3">User / Role</th><th class="py-2 pr-3">Plan</th><th class="py-2 pr-3">Amount</th><th class="py-2 pr-3">UTR Ref</th><th class="py-2 pr-3">Status</th><th class="py-2">Manual Action</th>
-          </tr></thead>
-          <tbody>${rows.map(p => `<tr class="border-b border-slate-100">
-            <td class="py-2 pr-3 font-mono">${p.id}</td>
-            <td class="py-2 pr-3">${p.user_id} <span class="text-slate-400">(${p.user_role})</span></td>
-            <td class="py-2 pr-3 font-semibold">${p.plan_name || p.plan_id}</td>
-            <td class="py-2 pr-3 font-bold">₹${p.amount_inr}</td>
-            <td class="py-2 pr-3 font-mono">${p.utr_number || '—'}</td>
-            <td class="py-2 pr-3"><span class="px-2 py-0.5 rounded-full font-bold ${p.status === 'verified' ? 'bg-emerald-100 text-emerald-800' : p.status === 'failed' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'}">${p.status}</span></td>
-            <td class="py-2 space-x-1 whitespace-nowrap">
-              <button type="button" data-verify-action="approve" data-txn="${p.id}" class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold hover:bg-emerald-500">Approve</button>
-              <button type="button" data-verify-action="reject" data-txn="${p.id}" class="px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold hover:bg-rose-500">Reject</button>
-            </td>
-          </tr>`).join('')}</tbody></table>`;
-        box.querySelectorAll('[data-verify-action]').forEach(btn => {
-          btn.addEventListener('click', async () => {
-            btn.disabled = true;
-            await fetch('/api/admin-verify-payment', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ txnId: btn.dataset.txn, action: btn.dataset.verifyAction })
-            });
-            fetchUtrLedger();
-          });
-        });
-      }
-      document.getElementById('btn-refresh-utr').addEventListener('click', fetchUtrLedger);
-      document.getElementById('utr-search').addEventListener('input', renderUtrLedger);
-      fetchUtrLedger();
-    })();
-  </script>
-
 
   <script>
     (function () {
@@ -964,6 +910,132 @@
       }
       document.getElementById('btn-save-client-rules')?.addEventListener('click', () => syncRoleToApi('client'));
       document.getElementById('btn-save-advisor-rules')?.addEventListener('click', () => syncRoleToApi('advisor'));
+    })();
+  </script>
+
+
+  <script>
+    (function () {
+      let cachedPayments = [];
+
+      async function fetchUtrLedger() {
+        const box = document.getElementById('utr-ledger-list');
+        if (!box) return;
+        try {
+          const res = await fetch('/api/admin-verify-payment?_t=' + Date.now(), { cache: 'no-store' });
+          const data = await res.json();
+          cachedPayments = data.payments || [];
+          renderUtrLedger();
+        } catch (e) {
+          box.innerHTML = '<p class="text-rose-600">Could not load UPI ledger.</p>';
+        }
+      }
+      window.fetchUtrLedger = fetchUtrLedger;
+
+      function syncLocalSubscription(payment, isVerified) {
+        if (typeof db === 'undefined' || !db) return;
+        if (Array.isArray(db.payments)) {
+          const lp = db.payments.find(x => x.id === payment.id || (payment.utr_number && x.utr === payment.utr_number));
+          if (lp) lp.status = isVerified ? 'verified' : 'failed';
+        }
+        if (isVerified && Array.isArray(db.users)) {
+          const u = db.users.find(x => x.id === payment.user_id);
+          const role = payment.user_role || (u && u.role) || 'client';
+          const plans = (db.subscriptionRules && db.subscriptionRules[role] && db.subscriptionRules[role].plans) || [];
+          const plan = plans.find(p => p.id === payment.plan_id) || {};
+          if (u) {
+            const credits = Number(plan.credits || 0);
+            const days = Number(plan.durationDays || 0);
+            const scope = plan.scope || 'pack';
+            u.subscriptionPlan = payment.plan_id;
+            u.subscriptionScope = scope;
+            u.contactCreditsRemaining = scope.includes('unlimited')
+              ? 999999
+              : (Number(u.contactCreditsRemaining) || 0) + credits;
+            u.subscriptionExpiresAt = days > 0 ? new Date(Date.now() + days * 86400000).toISOString() : null;
+          }
+        }
+        if (typeof saveDB === 'function') saveDB();
+      }
+
+      function renderUtrLedger() {
+        const box = document.getElementById('utr-ledger-list');
+        if (!box) return;
+        const q = ((document.getElementById('utr-search') || {}).value || '').toLowerCase();
+        const rows = cachedPayments.filter(p =>
+          !q ||
+          (p.id || '').toLowerCase().includes(q) ||
+          (p.utr_number || '').toLowerCase().includes(q) ||
+          (p.user_id || '').toLowerCase().includes(q)
+        );
+        if (!rows.length) {
+          box.innerHTML = '<p class="text-slate-400 py-3">No matching UPI transactions found.</p>';
+          return;
+        }
+        box.innerHTML = `<table class="w-full text-left border-collapse">
+          <thead><tr class="border-b border-slate-200 text-slate-500">
+            <th class="py-2 pr-3">Txn ID</th>
+            <th class="py-2 pr-3">User / Role</th>
+            <th class="py-2 pr-3">Plan</th>
+            <th class="py-2 pr-3">Amount</th>
+            <th class="py-2 pr-3">UTR Ref</th>
+            <th class="py-2 pr-3">Status</th>
+            <th class="py-2">UTR Verification Toggle</th>
+          </tr></thead>
+          <tbody>${rows.map(p => {
+            const isVerified = p.status === 'verified';
+            return `<tr class="border-b border-slate-100">
+              <td class="py-2.5 pr-3 font-mono">${p.id}</td>
+              <td class="py-2.5 pr-3">${p.user_id} <span class="text-slate-400">(${p.user_role})</span></td>
+              <td class="py-2.5 pr-3 font-semibold">${p.plan_name || p.plan_id}</td>
+              <td class="py-2.5 pr-3 font-bold">₹${p.amount_inr}</td>
+              <td class="py-2.5 pr-3 font-mono">${p.utr_number || '—'}</td>
+              <td class="py-2.5 pr-3">
+                <span class="px-2 py-0.5 rounded-full font-bold ${isVerified ? 'bg-emerald-100 text-emerald-800' : p.status === 'failed' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'}">
+                  ${isVerified ? 'verified (active)' : p.status}
+                </span>
+              </td>
+              <td class="py-2.5">
+                <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                  <input type="checkbox" data-utr-toggle="${p.id}" class="sr-only peer" ${isVerified ? 'checked' : ''} />
+                  <div class="relative w-11 h-6 bg-slate-200 rounded-full peer peer-checked:bg-emerald-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+                  <span class="text-xs font-bold ${isVerified ? 'text-emerald-700' : 'text-slate-600'}">${isVerified ? 'Confirmed' : 'Pending'}</span>
+                </label>
+              </td>
+            </tr>`;
+          }).join('')}</tbody></table>`;
+
+        box.querySelectorAll('[data-utr-toggle]').forEach(toggle => {
+          toggle.addEventListener('change', async () => {
+            const txnId = toggle.dataset.utrToggle;
+            const action = toggle.checked ? 'approve' : 'reject';
+            toggle.disabled = true;
+            try {
+              const res = await fetch('/api/admin-verify-payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ txnId, action })
+              });
+              const data = await res.json();
+              if (!res.ok || !data.ok) throw new Error(data.error || 'Verification failed');
+              const payment = cachedPayments.find(p => p.id === txnId);
+              if (payment) syncLocalSubscription(payment, action === 'approve');
+              if (typeof toast === 'function') {
+                toast(action === 'approve'
+                  ? 'UTR confirmed — subscription enabled!'
+                  : 'UTR marked rejected');
+              }
+            } catch (err) {
+              alert(err.message || 'Could not update UTR verification');
+            } finally {
+              fetchUtrLedger();
+            }
+          });
+        });
+      }
+
+      document.getElementById('btn-refresh-utr')?.addEventListener('click', fetchUtrLedger);
+      document.getElementById('utr-search')?.addEventListener('input', renderUtrLedger);
     })();
   </script>
 
