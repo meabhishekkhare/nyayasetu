@@ -37,9 +37,7 @@
             <span id="session-badge" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
               Not Signed In
             </span>
-            <span id="cloud-status-badge" class="hidden text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-900/60 text-blue-200 border border-blue-700/60">
-              Cloud DB: Preview
-            </span>
+
           </div>
           <p class="text-xs text-slate-300 hidden sm:block">Verified Legal Case Intake, Advisor Directory &amp; Case Mail</p>
         </div>
@@ -135,12 +133,7 @@
           </button>
         </div>
 
-        <!-- Auth Mode Tabs -->
-        <div class="flex border-b border-slate-200 mb-5 text-sm font-semibold">
-          <button id="auth-tab-login" type="button" class="flex-1 pb-2.5 border-b-2 border-slate-900 text-slate-900">Login</button>
-          <button id="auth-tab-register" type="button" class="flex-1 pb-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800">Register</button>
-          <button id="auth-tab-forgot" type="button" class="flex-1 pb-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800">Forgot Password</button>
-        </div>
+
 
         <!-- Login Form -->
         <form id="form-login" class="space-y-4">
@@ -155,17 +148,7 @@
           <button type="submit" class="w-full py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-slate-800 transition">
             Sign In
           </button>
-          <div class="pt-3 border-t border-slate-100">
-            <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">Quick Demo Accounts (1-Click Fill &amp; Login)</p>
-            <div class="flex flex-wrap gap-2">
-              <button id="demo-client-login" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100">
-                Demo Requestee (Rohan)
-              </button>
-              <button id="demo-advisor-login" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-900 border border-blue-200 hover:bg-blue-100">
-                Demo Advisor (Adv. Arvind)
-              </button>
-            </div>
-          </div>
+
         </form>
 
         <!-- Register Form -->
@@ -192,12 +175,16 @@
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label for="reg-city" class="block text-xs font-semibold text-slate-700 mb-1">City *</label>
-              <input id="reg-city" type="text" required placeholder="Bhopal" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
+              <label for="reg-state" class="block text-xs font-semibold text-slate-700 mb-1">State *</label>
+              <select id="reg-state" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white">
+                <option value="">Select State / UT</option>
+              </select>
             </div>
             <div>
-              <label for="reg-state" class="block text-xs font-semibold text-slate-700 mb-1">State *</label>
-              <input id="reg-state" type="text" required placeholder="Madhya Pradesh" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
+              <label for="reg-city" class="block text-xs font-semibold text-slate-700 mb-1">City *</label>
+              <select id="reg-city" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white">
+                <option value="">Select City</option>
+              </select>
             </div>
             <div>
               <label for="reg-pin" class="block text-xs font-semibold text-slate-700 mb-1">PIN Code *</label>
@@ -237,6 +224,19 @@
             Reset Password
           </button>
         </form>
+
+        <!-- Bottom Auth Links -->
+        <div class="mt-5 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs font-semibold">
+          <button id="auth-tab-register" type="button" class="text-blue-700 hover:text-blue-900 hover:underline">
+            New user? Register here
+          </button>
+          <button id="auth-tab-forgot" type="button" class="text-slate-500 hover:text-slate-800 hover:underline">
+            Forgot Password?
+          </button>
+          <button id="auth-tab-login" type="button" class="hidden text-blue-700 hover:text-blue-900 hover:underline">
+            &larr; Back to Login
+          </button>
+        </div>
       </div>
     </section>
 
@@ -325,12 +325,16 @@
               <input id="case-pin" type="text" maxlength="6" pattern="[0-9]{6}" required placeholder="e.g. 462011" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
             </div>
             <div>
-              <label for="case-city" class="block text-xs font-semibold text-slate-700 mb-1">City *</label>
-              <input id="case-city" type="text" required placeholder="e.g. Bhopal" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
+              <label for="case-state" class="block text-xs font-semibold text-slate-700 mb-1">State *</label>
+              <select id="case-state" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white">
+                <option value="">Select State / UT</option>
+              </select>
             </div>
             <div>
-              <label for="case-state" class="block text-xs font-semibold text-slate-700 mb-1">State *</label>
-              <input id="case-state" type="text" required placeholder="e.g. Madhya Pradesh" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
+              <label for="case-city" class="block text-xs font-semibold text-slate-700 mb-1">City *</label>
+              <select id="case-city" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white">
+                <option value="">Select City</option>
+              </select>
             </div>
             <div>
               <label for="case-type" class="block text-xs font-semibold text-slate-700 mb-1">Incident / Case Type *</label>
@@ -637,12 +641,16 @@
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label for="adv-city" class="block text-xs font-semibold text-slate-700 mb-1">City *</label>
-              <input id="adv-city" type="text" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
+              <label for="adv-state" class="block text-xs font-semibold text-slate-700 mb-1">State *</label>
+              <select id="adv-state" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white">
+                <option value="">Select State / UT</option>
+              </select>
             </div>
             <div>
-              <label for="adv-state" class="block text-xs font-semibold text-slate-700 mb-1">State *</label>
-              <input id="adv-state" type="text" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
+              <label for="adv-city" class="block text-xs font-semibold text-slate-700 mb-1">City *</label>
+              <select id="adv-city" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white">
+                <option value="">Select City</option>
+              </select>
             </div>
             <div>
               <label for="adv-pin" class="block text-xs font-semibold text-slate-700 mb-1">PIN Code *</label>
@@ -865,13 +873,122 @@
     };
 
     const STATE_CODES = {
+      'andhra pradesh': 'AP',
+      'arunachal pradesh': 'AR',
+      'assam': 'AS',
+      'bihar': 'BR',
+      'chhattisgarh': 'CG',
+      'goa': 'GA',
+      'gujarat': 'GJ',
+      'haryana': 'HR',
+      'himachal pradesh': 'HP',
+      'jharkhand': 'JH',
+      'karnataka': 'KA',
+      'kerala': 'KL',
       'madhya pradesh': 'MP',
       'maharashtra': 'MH',
-      'delhi': 'DL',
-      'karnataka': 'KA',
+      'manipur': 'MN',
+      'meghalaya': 'ML',
+      'mizoram': 'MZ',
+      'nagaland': 'NL',
+      'odisha': 'OD',
+      'punjab': 'PB',
+      'rajasthan': 'RJ',
+      'sikkim': 'SK',
+      'tamil nadu': 'TN',
+      'telangana': 'TS',
+      'tripura': 'TR',
       'uttar pradesh': 'UP',
-      'rajasthan': 'RJ'
+      'uttarakhand': 'UK',
+      'west bengal': 'WB',
+      'andaman and nicobar islands': 'AN',
+      'chandigarh': 'CH',
+      'dadra and nagar haveli and daman and diu': 'DN',
+      'delhi': 'DL',
+      'jammu and kashmir': 'JK',
+      'ladakh': 'LA',
+      'lakshadweep': 'LD',
+      'puducherry': 'PY'
     };
+
+    const INDIA_STATES_CITIES = {
+      'Andaman and Nicobar Islands': ['Port Blair', 'Diglipur', 'Mayabunder', 'Rangat'],
+      'Andhra Pradesh': ['Visakhapatnam', 'Vijayawada', 'Guntur', 'Nellore', 'Kurnool', 'Tirupati', 'Rajahmundry', 'Kakinada', 'Anantapur', 'Kadapa'],
+      'Arunachal Pradesh': ['Itanagar', 'Naharlagun', 'Pasighat', 'Tawang', 'Ziro'],
+      'Assam': ['Guwahati', 'Silchar', 'Dibrugarh', 'Jorhat', 'Nagaon', 'Tinsukia', 'Tezpur'],
+      'Bihar': ['Patna', 'Gaya', 'Bhagalpur', 'Muzaffarpur', 'Purnia', 'Darbhanga', 'Arrah', 'Begusarai', 'Katihar'],
+      'Chandigarh': ['Chandigarh'],
+      'Chhattisgarh': ['Raipur', 'Bhilai', 'Bilaspur', 'Korba', 'Durg', 'Rajnandgaon', 'Jagdalpur', 'Raigarh', 'Ambikapur'],
+      'Dadra and Nagar Haveli and Daman and Diu': ['Daman', 'Diu', 'Silvassa'],
+      'Delhi': ['New Delhi', 'Central Delhi', 'East Delhi', 'North Delhi', 'South Delhi', 'West Delhi', 'Dwarka', 'Rohini', 'Saket'],
+      'Goa': ['Panaji', 'Margao', 'Vasco da Gama', 'Mapusa', 'Ponda'],
+      'Gujarat': ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Bhavnagar', 'Jamnagar', 'Junagadh', 'Gandhinagar', 'Anand', 'Navsari'],
+      'Haryana': ['Gurugram', 'Faridabad', 'Panipat', 'Ambala', 'Yamunanagar', 'Rohtak', 'Hisar', 'Karnal', 'Sonipat', 'Panchkula'],
+      'Himachal Pradesh': ['Shimla', 'Dharamshala', 'Solan', 'Mandi', 'Kullu', 'Hamirpur', 'Una', 'Bilaspur'],
+      'Jammu and Kashmir': ['Srinagar', 'Jammu', 'Anantnag', 'Baramulla', 'Udhampur', 'Kathua'],
+      'Jharkhand': ['Ranchi', 'Jamshedpur', 'Dhanbad', 'Bokaro', 'Deoghar', 'Hazaribagh', 'Giridih'],
+      'Karnataka': ['Bengaluru', 'Mysuru', 'Hubballi-Dharwad', 'Mangaluru', 'Belagavi', 'Kalaburagi', 'Davanagere', 'Ballari', 'Shivamogga', 'Tumakuru'],
+      'Kerala': ['Thiruvananthapuram', 'Kochi', 'Kozhikode', 'Thrissur', 'Kollam', 'Palakkad', 'Alappuzha', 'Kannur', 'Kottayam'],
+      'Ladakh': ['Leh', 'Kargil'],
+      'Lakshadweep': ['Kavaratti', 'Agatti', 'Minicoy'],
+      'Madhya Pradesh': ['Bhopal', 'Indore', 'Jabalpur', 'Gwalior', 'Ujjain', 'Sagar', 'Rewa', 'Satna', 'Ratlam', 'Dewas', 'Katni', 'Singrauli', 'Burhanpur', 'Khandwa', 'Chhindwara', 'Guna', 'Shivpuri', 'Vidisha', 'Damoh', 'Mandsaur', 'Neemuch', 'Hoshangabad', 'Itarsi', 'Sehore', 'Betul', 'Seoni', 'Balaghat', 'Shahdol'],
+      'Maharashtra': ['Mumbai', 'Pune', 'Nagpur', 'Thane', 'Nashik', 'Chhatrapati Sambhajinagar', 'Solapur', 'Kolhapur', 'Amravati', 'Navi Mumbai', 'Sangli', 'Jalgaon', 'Akola', 'Latur', 'Dhule', 'Ahmednagar', 'Chandrapur', 'Nanded'],
+      'Manipur': ['Imphal', 'Thoubal', 'Bishnupur', 'Churachandpur'],
+      'Meghalaya': ['Shillong', 'Tura', 'Jowai', 'Nongpoh'],
+      'Mizoram': ['Aizawl', 'Lunglei', 'Champhai', 'Serchhip'],
+      'Nagaland': ['Kohima', 'Dimapur', 'Mokokchung', 'Tuensang'],
+      'Odisha': ['Bhubaneswar', 'Cuttack', 'Rourkela', 'Berhampur', 'Sambalpur', 'Puri', 'Balasore', 'Baripada'],
+      'Puducherry': ['Puducherry', 'Karaikal', 'Mahe', 'Yanam'],
+      'Punjab': ['Ludhiana', 'Amritsar', 'Jalandhar', 'Patiala', 'Bathinda', 'Mohali', 'Pathankot', 'Hoshiarpur', 'Moga'],
+      'Rajasthan': ['Jaipur', 'Jodhpur', 'Kota', 'Bikaner', 'Ajmer', 'Udaipur', 'Bhilwara', 'Alwar', 'Sikar', 'Bharatpur', 'Pali'],
+      'Sikkim': ['Gangtok', 'Namchi', 'Gyalshing', 'Mangan'],
+      'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Salem', 'Tirunelveli', 'Tiruppur', 'Vellore', 'Erode', 'Thoothukudi', 'Thanjavur'],
+      'Telangana': ['Hyderabad', 'Warangal', 'Nizamabad', 'Karimnagar', 'Khammam', 'Ramagundam', 'Mahbubnagar', 'Nalgonda'],
+      'Tripura': ['Agartala', 'Udaipur', 'Dharmanagar', 'Kailashahar'],
+      'Uttar Pradesh': ['Lucknow', 'Kanpur', 'Ghaziabad', 'Agra', 'Varanasi', 'Meerut', 'Prayagraj', 'Bareilly', 'Aligarh', 'Moradabad', 'Saharanpur', 'Gorakhpur', 'Noida', 'Jhansi', 'Mathura', 'Ayodhya'],
+      'Uttarakhand': ['Dehradun', 'Haridwar', 'Roorkee', 'Haldwani', 'Rudrapur', 'Rishikesh', 'Nainital'],
+      'West Bengal': ['Kolkata', 'Howrah', 'Asansol', 'Siliguri', 'Durgapur', 'Bardhaman', 'Malda', 'Baharampur', 'Kharagpur']
+    };
+
+    function populateStateSelect(stateId, selectedState = '') {
+      const sel = document.getElementById(stateId);
+      if (!sel) return;
+      const states = Object.keys(INDIA_STATES_CITIES);
+      sel.innerHTML = '<option value="">Select State / UT</option>' +
+        states.map(s => `<option value="${s}">${s}</option>`).join('');
+      if (selectedState) {
+        if (!states.includes(selectedState)) {
+          sel.innerHTML += `<option value="${selectedState}">${selectedState}</option>`;
+        }
+        sel.value = selectedState;
+      }
+    }
+
+    function populateCitySelect(stateId, cityId, selectedCity = '') {
+      const stateSel = document.getElementById(stateId);
+      const citySel = document.getElementById(cityId);
+      if (!stateSel || !citySel) return;
+      const st = stateSel.value;
+      const cities = INDIA_STATES_CITIES[st] ? [...INDIA_STATES_CITIES[st]] : [];
+      if (selectedCity && !cities.includes(selectedCity)) {
+        cities.unshift(selectedCity);
+      }
+      citySel.innerHTML = '<option value="">Select City</option>' +
+        cities.map(c => `<option value="${c}">${c}</option>`).join('');
+      if (selectedCity) {
+        citySel.value = selectedCity;
+      }
+    }
+
+    function initStateCityPair(stateId, cityId, defaultState = '', defaultCity = '') {
+      populateStateSelect(stateId, defaultState);
+      populateCitySelect(stateId, cityId, defaultCity);
+      const stateSel = document.getElementById(stateId);
+      if (stateSel && !stateSel.dataset.boundCity) {
+        stateSel.dataset.boundCity = '1';
+        stateSel.addEventListener('change', () => populateCitySelect(stateId, cityId));
+      }
+    }
 
     const CASE_TYPE_CODES = {
       'Theft': 'THF',
@@ -1102,14 +1219,7 @@
 
     function updateCloudStatusUI() {
       const connected = Boolean(cloudCfg && cloudCfg.url && cloudCfg.url.startsWith('https://'));
-      const badge = document.getElementById('cloud-status-badge');
       const panelStatus = document.getElementById('cloud-panel-status');
-      if (badge) {
-        badge.textContent = connected ? `Cloud DB: ${cloudCfg.provider.toUpperCase()}` : 'Cloud DB: Preview';
-        badge.className = connected
-          ? 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-900/60 text-emerald-200 border border-emerald-700/60'
-          : 'text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-900/60 text-blue-200 border border-blue-700/60';
-      }
       if (panelStatus) {
         panelStatus.textContent = connected ? `Connected (${cloudCfg.provider.toUpperCase()})` : 'Not Connected (Preview Mode)';
         panelStatus.className = connected
@@ -1274,11 +1384,13 @@
     function setAuthTab(tab) {
       ['login', 'register', 'forgot'].forEach(t => {
         document.getElementById(`form-${t}`).classList.toggle('hidden', t !== tab);
-        const btn = document.getElementById(`auth-tab-${t}`);
-        btn.className = t === tab
-          ? 'flex-1 pb-2.5 border-b-2 border-slate-900 text-slate-900'
-          : 'flex-1 pb-2.5 border-b-2 border-transparent text-slate-500 hover:text-slate-800';
       });
+      const regBtn = document.getElementById('auth-tab-register');
+      const forgotBtn = document.getElementById('auth-tab-forgot');
+      const loginBtn = document.getElementById('auth-tab-login');
+      if (regBtn) regBtn.classList.toggle('hidden', tab === 'register');
+      if (forgotBtn) forgotBtn.classList.toggle('hidden', tab === 'forgot');
+      if (loginBtn) loginBtn.classList.toggle('hidden', tab === 'login');
       if (tab === 'register') {
         if (session.roleSelection === 'client') db.funnelStats.clientRegistrationVisits += 1;
         else db.funnelStats.advisorRegistrationVisits += 1;
@@ -1602,8 +1714,7 @@
       document.getElementById('adv-exp').value = a.yearsOfExperience ?? '';
       document.getElementById('adv-fee-min').value = a.feeMin ?? '';
       document.getElementById('adv-fee-max').value = a.feeMax ?? '';
-      document.getElementById('adv-city').value = a.city || '';
-      document.getElementById('adv-state').value = a.state || '';
+      initStateCityPair('adv-state', 'adv-city', a.state || '', a.city || '');
       document.getElementById('adv-pin').value = a.pin || '';
       document.getElementById('adv-specs').value = (a.specialisations || []).join(', ');
       document.getElementById('adv-address').value = a.address || '';
@@ -1978,6 +2089,9 @@
       });
 
       loadDB();
+      initStateCityPair('reg-state', 'reg-city');
+      initStateCityPair('case-state', 'case-city');
+      initStateCityPair('adv-state', 'adv-city');
       startAdvisorCountdown();
       ['case-pin', 'case-city', 'case-state', 'case-type'].forEach(id => {
         const el = document.getElementById(id);
@@ -1995,18 +2109,17 @@
           toast('Selected ' + inc);
         });
       });
-      showWindow('win-splash');
-      let splashTimer = setTimeout(() => {
-        if (!document.getElementById('win-splash').classList.contains('hidden')) {
-          showWindow('win-auth');
-        }
-      }, 3200);
+      showWindow('win-auth');
+      setAuthTab('login');
       document.getElementById('btn-enter-platform').addEventListener('click', () => {
-        clearTimeout(splashTimer);
         showWindow('win-auth');
+        setAuthTab('login');
       });
 
-      document.getElementById('btn-home').addEventListener('click', () => showWindow('win-splash'));
+      document.getElementById('btn-home').addEventListener('click', () => {
+        showWindow('win-auth');
+        setAuthTab('login');
+      });
       document.getElementById('btn-logout').addEventListener('click', () => {
         session.userId = null;
         session.adminAuthed = false;
@@ -2028,15 +2141,7 @@
       document.getElementById('auth-tab-register').addEventListener('click', () => setAuthTab('register'));
       document.getElementById('auth-tab-forgot').addEventListener('click', () => setAuthTab('forgot'));
 
-      // Demo 1-click Logins
-      document.getElementById('demo-client-login').addEventListener('click', () => {
-        const u = db.users.find(x => x.id === 'cli-1');
-        if (u) loginUser(u);
-      });
-      document.getElementById('demo-advisor-login').addEventListener('click', () => {
-        const u = db.users.find(x => x.id === 'adv-1');
-        if (u) loginUser(u);
-      });
+
 
       // Login Submit
       document.getElementById('form-login').addEventListener('submit', e => {
@@ -2141,8 +2246,8 @@
         const pin = e.target.value.trim();
         if (PIN_DIRECTORY[pin]) {
           const info = PIN_DIRECTORY[pin];
-          document.getElementById('case-city').value = info.city;
-          document.getElementById('case-state').value = info.state;
+          populateStateSelect('case-state', info.state);
+          populateCitySelect('case-state', 'case-city', info.city);
           document.getElementById('case-station').value = info.station;
           document.getElementById('case-lat').value = info.lat;
           document.getElementById('case-lng').value = info.lng;
