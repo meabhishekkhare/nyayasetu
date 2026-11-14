@@ -863,5 +863,80 @@
       });
     });
   </script>
+
+  <!-- MANUAL UTR / REFERENCE ID VERIFICATION PANEL -->
+  <section id="admin-utr-panel" class="max-w-6xl mx-auto px-4 py-6">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h2 class="text-base font-bold text-slate-900">Manual UPI / UTR Reference Verification</h2>
+          <p class="text-xs text-slate-500">Review UPI transactions by Txn ID or 12-digit UTR and manually Approve (activates user plan) or Reject.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <input id="utr-search" type="text" placeholder="Search Txn ID, UTR, or User ID..." class="px-3 py-1.5 rounded-xl border border-slate-300 text-xs" />
+          <button id="btn-refresh-utr" type="button" class="px-3 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800">Refresh Ledger</button>
+        </div>
+      </div>
+      <div id="utr-ledger-list" class="overflow-x-auto text-xs text-slate-600">Loading UPI transactions...</div>
+    </div>
+  </section>
+  <script>
+    (function () {
+      let cachedPayments = [];
+      async function fetchUtrLedger() {
+        const box = document.getElementById('utr-ledger-list');
+        try {
+          const res = await fetch('/api/admin-verify-payment');
+          const data = await res.json();
+          cachedPayments = data.payments || [];
+          renderUtrLedger();
+        } catch (e) {
+          box.innerHTML = '<p class="text-rose-600">Could not load UPI ledger.</p>';
+        }
+      }
+      function renderUtrLedger() {
+        const box = document.getElementById('utr-ledger-list');
+        const q = (document.getElementById('utr-search').value || '').toLowerCase();
+        const rows = cachedPayments.filter(p =>
+          !q || (p.id || '').toLowerCase().includes(q) || (p.utr_number || '').toLowerCase().includes(q) || (p.user_id || '').toLowerCase().includes(q)
+        );
+        if (!rows.length) {
+          box.innerHTML = '<p class="text-slate-400 py-3">No matching UPI transactions found.</p>';
+          return;
+        }
+        box.innerHTML = `<table class="w-full text-left border-collapse">
+          <thead><tr class="border-b border-slate-200 text-slate-500">
+            <th class="py-2 pr-3">Txn ID</th><th class="py-2 pr-3">User / Role</th><th class="py-2 pr-3">Plan</th><th class="py-2 pr-3">Amount</th><th class="py-2 pr-3">UTR Ref</th><th class="py-2 pr-3">Status</th><th class="py-2">Manual Action</th>
+          </tr></thead>
+          <tbody>${rows.map(p => `<tr class="border-b border-slate-100">
+            <td class="py-2 pr-3 font-mono">${p.id}</td>
+            <td class="py-2 pr-3">${p.user_id} <span class="text-slate-400">(${p.user_role})</span></td>
+            <td class="py-2 pr-3 font-semibold">${p.plan_name || p.plan_id}</td>
+            <td class="py-2 pr-3 font-bold">₹${p.amount_inr}</td>
+            <td class="py-2 pr-3 font-mono">${p.utr_number || '—'}</td>
+            <td class="py-2 pr-3"><span class="px-2 py-0.5 rounded-full font-bold ${p.status === 'verified' ? 'bg-emerald-100 text-emerald-800' : p.status === 'failed' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'}">${p.status}</span></td>
+            <td class="py-2 space-x-1 whitespace-nowrap">
+              <button type="button" data-verify-action="approve" data-txn="${p.id}" class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold hover:bg-emerald-500">Approve</button>
+              <button type="button" data-verify-action="reject" data-txn="${p.id}" class="px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold hover:bg-rose-500">Reject</button>
+            </td>
+          </tr>`).join('')}</tbody></table>`;
+        box.querySelectorAll('[data-verify-action]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            btn.disabled = true;
+            await fetch('/api/admin-verify-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ txnId: btn.dataset.txn, action: btn.dataset.verifyAction })
+            });
+            fetchUtrLedger();
+          });
+        });
+      }
+      document.getElementById('btn-refresh-utr').addEventListener('click', fetchUtrLedger);
+      document.getElementById('utr-search').addEventListener('input', renderUtrLedger);
+      fetchUtrLedger();
+    })();
+  </script>
+
 </body>
 </html>

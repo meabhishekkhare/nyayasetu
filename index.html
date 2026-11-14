@@ -1536,33 +1536,58 @@
     let activeOrderId = null;
     let selectedPlan = null;
 
-    const SUB_PLANS = {
+    const DEFAULT_SUB_PLANS = {
       client: [
-        { id: 'client_pro_monthly', name: 'Client Pro Monthly', amountInr: 199, label: '₹199 / mo', perks: 'Unlimited case filings, full PIN/City/State advisor search & case mail.' },
-        { id: 'client_pro_annual', name: 'Client Pro Annual', amountInr: 1999, label: '₹1,999 / yr', perks: 'Save 16% — full year unlimited case filings & advisor access.' }
+        { id: 'cli_pay_per_contact', name: 'Single Contact Unlock', priceInr: 9, credits: 1, durationDays: 0, scope: 'per_contact', enabled: true, description: '₹9 per advisor contact accessibility' },
+        { id: 'cli_pack_5', name: '5 Contacts Pack', priceInr: 29, credits: 5, durationDays: 0, scope: 'pack', enabled: true, description: '₹29 for 5 advisor contacts' },
+        { id: 'cli_pack_20', name: '20 Contacts Pack', priceInr: 99, credits: 20, durationDays: 0, scope: 'pack', enabled: true, description: '₹99 for 20 advisor contacts' },
+        { id: 'cli_unlimited_28d', name: '28-Day Unlimited Access', priceInr: 149, credits: 999999, durationDays: 28, scope: 'all_unlimited', enabled: true, description: '₹149 for 28 days free accessibility to all advisor contacts' }
       ],
       advisor: [
-        { id: 'advisor_pro_monthly', name: 'Advisor Pro Monthly', amountInr: 499, label: '₹499 / mo', perks: 'Unlimited client contact unlocks from the case pool & direct mail.' },
-        { id: 'advisor_pro_annual', name: 'Advisor Pro Annual', amountInr: 4999, label: '₹4,999 / yr', perks: 'Save 16% — full year unlimited client contact unlocks & priority badge.' }
+        { id: 'adv_pay_per_contact', name: 'Single Contact Unlock', priceInr: 5, credits: 1, durationDays: 0, scope: 'per_contact', enabled: true, description: '₹5 to access each client contact' },
+        { id: 'adv_monthly_5', name: 'Monthly 5 Pool Contacts', priceInr: 9, credits: 5, durationDays: 30, scope: 'pool', enabled: true, description: '₹9/month to access 5 contacts from the complaint pool' },
+        { id: 'adv_monthly_notified', name: 'Monthly Unlimited Notified', priceInr: 149, credits: 999999, durationDays: 30, scope: 'notified_unlimited', enabled: true, description: '₹149/month unlimited contacts for notified or client-reached-out cases' },
+        { id: 'adv_28d_100', name: '28-Day 100 Pool Contacts', priceInr: 599, credits: 100, durationDays: 28, scope: 'pool', enabled: true, description: '₹599 for 28 days subscription to 100 contact views from pool' }
       ]
     };
 
+    let liveSubPlans = JSON.parse(JSON.stringify(DEFAULT_SUB_PLANS));
+
+    async function loadLiveSubPlans(role) {
+      try {
+        if (cloudCfg && cloudCfg.url && cloudCfg.key && cloudCfg.provider === 'supabase') {
+          const base = cloudCfg.url.replace(/\/+$/, '');
+          const res = await fetch(`${base}/rest/v1/nyayasetu_subscription_rules?role=eq.${encodeURIComponent(role)}&select=plans`, {
+            headers: { apikey: cloudCfg.key, Authorization: `Bearer ${cloudCfg.key}` }
+          });
+          if (res.ok) {
+            const rows = await res.json();
+            if (rows[0] && Array.isArray(rows[0].plans) && rows[0].plans.length) {
+              liveSubPlans[role] = rows[0].plans;
+            }
+          }
+        }
+      } catch (e) {}
+      renderPlanOptions(role);
+    }
+
     function renderPlanOptions(role) {
       const container = document.getElementById('sub-plan-options');
-      const plans = SUB_PLANS[role] || SUB_PLANS.client;
+      const plans = (liveSubPlans[role] || DEFAULT_SUB_PLANS.client).filter(p => p.enabled !== false);
       if (!selectedPlan || !plans.some(p => p.id === selectedPlan.id)) {
         selectedPlan = plans[0];
       }
       container.innerHTML = plans.map(p => {
-        const active = selectedPlan.id === p.id;
+        const active = selectedPlan && selectedPlan.id === p.id;
         return `<button type="button" data-plan-id="${p.id}" class="text-left p-3 rounded-xl border-2 transition ${active ? 'border-blue-600 bg-blue-50' : 'border-slate-200 bg-slate-50 hover:border-slate-300'}">
           <div class="flex items-center justify-between gap-1">
             <span class="font-bold text-slate-900 text-xs">${p.name}</span>
-            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[11px]">${p.label}</span>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[11px]">₹${p.priceInr}</span>
           </div>
+          <p class="text-[11px] text-slate-500 mt-1">${p.description || ''}</p>
         </button>`;
       }).join('');
-      document.getElementById('sub-plan-perks').textContent = selectedPlan.perks;
+      document.getElementById('sub-plan-perks').textContent = selectedPlan ? (selectedPlan.description || '') : '';
       container.querySelectorAll('[data-plan-id]').forEach(btn => {
         btn.addEventListener('click', () => {
           selectedPlan = plans.find(p => p.id === btn.dataset.planId);
@@ -1582,12 +1607,13 @@
       document.getElementById('sub-upi-utr').value = '';
       if (role === 'client') {
         title.textContent = 'Client Subscription Required';
-        desc.textContent = 'You have used your 1st free case lifecycle. Select a plan below to raise additional cases and unlock advisors.';
+        desc.textContent = 'Select a plan below to unlock advisor contacts and raise additional cases.';
       } else {
         title.textContent = 'Advisor Subscription Required';
-        desc.textContent = 'You have used all 3 free client contact number unlocks. Select a plan below to unlock more contacts.';
+        desc.textContent = 'Select a plan below to unlock more client contacts from the case pool.';
       }
       renderPlanOptions(role);
+      loadLiveSubPlans(role);
       document.getElementById('sub-modal').classList.remove('hidden');
     }
 
@@ -2489,7 +2515,7 @@
       document.getElementById('btn-cancel-sub').addEventListener('click', () => document.getElementById('sub-modal').classList.add('hidden'));
       document.getElementById('btn-pay-sub').addEventListener('click', async () => {
         const user = db.users.find(u => u.id === session.userId);
-        if (!user) return;
+        if (!user || !selectedPlan) return;
         const btn = document.getElementById('btn-pay-sub');
         btn.disabled = true;
         btn.textContent = 'Generating UPI...';
@@ -2499,18 +2525,20 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               userId: user.id,
-              role: activeSubRole,
+              userRole: activeSubRole,
+              userName: user.name,
               planId: selectedPlan.id,
-              amountInr: selectedPlan.amountInr
+              planName: selectedPlan.name,
+              amountInr: selectedPlan.priceInr
             })
           });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || 'Failed to create UPI order');
-          activeOrderId = data.orderId || data.id;
-          const upiUri = data.upiUri || data.upiLink;
-          document.getElementById('sub-upi-order').textContent = 'Order: ' + activeOrderId;
-          document.getElementById('sub-upi-deeplink').href = upiUri;
-          document.getElementById('sub-upi-qr').src = data.qrUrl || ('https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(upiUri));
+          activeOrderId = data.txnId || data.orderId || data.id;
+          const upiUri = data.upiLink || data.gpayLink || data.upiUri;
+          document.getElementById('sub-upi-order').textContent = 'Txn: ' + activeOrderId;
+          document.getElementById('sub-upi-deeplink').href = data.gpayLink || upiUri;
+          document.getElementById('sub-upi-qr').src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(upiUri);
           document.getElementById('sub-upi-step').classList.remove('hidden');
           document.getElementById('sub-modal-actions').classList.add('hidden');
         } catch (err) {
@@ -2523,7 +2551,7 @@
 
       document.getElementById('btn-confirm-upi').addEventListener('click', async () => {
         const utr = document.getElementById('sub-upi-utr').value.trim();
-        if (!utr || utr.length < 8) { toast('Enter a valid UPI / UTR Reference ID'); return; }
+        if (!utr || utr.length < 6) { toast('Enter a valid UPI / UTR Reference ID (min 6 chars)'); return; }
         const btn = document.getElementById('btn-confirm-upi');
         btn.disabled = true;
         btn.textContent = 'Verifying...';
@@ -2531,7 +2559,15 @@
           const res = await fetch('/api/confirm-payment', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ orderId: activeOrderId, utr, userId: session.userId })
+            body: JSON.stringify({
+              txnId: activeOrderId,
+              userId: session.userId,
+              utrNumber: utr,
+              planId: selectedPlan.id,
+              credits: selectedPlan.credits || 0,
+              durationDays: selectedPlan.durationDays || 0,
+              scope: selectedPlan.scope || 'pack'
+            })
           });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || 'Payment confirmation failed');
@@ -2540,7 +2576,7 @@
           document.getElementById('sub-modal').classList.add('hidden');
           if (activeSubRole === 'client') renderClientSubBanner();
           else renderAdvisorPortal();
-          toast('Pro subscription activated!');
+          toast('Payment verified & plan activated!');
         } catch (err) {
           toast(err.message || 'Verification failed');
         } finally {
