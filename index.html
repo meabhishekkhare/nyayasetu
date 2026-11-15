@@ -2208,20 +2208,51 @@
 
 
       // Login Submit
-      document.getElementById('form-login').addEventListener('submit', e => {
+      function normLoginPhone(v) {
+        return String(v || '').replace(/\D/g, '').replace(/^91(?=\d{10}$)/, '');
+      }
+
+      document.getElementById('form-login').addEventListener('submit', async e => {
         e.preventDefault();
         const ident = document.getElementById('login-email').value.trim().toLowerCase();
+        const cleanPhone = normLoginPhone(ident);
         const pwd = document.getElementById('login-password').value;
-        const user = db.users.find(u =>
+        let user = db.users.find(u =>
           u.role === session.roleSelection &&
-          ((u.email || '').toLowerCase() === ident || (u.phone || '').toLowerCase() === ident) &&
+          (
+            (u.email || '').trim().toLowerCase() === ident ||
+            (u.phone || '').trim().toLowerCase() === ident ||
+            (cleanPhone && normLoginPhone(u.phone) === cleanPhone)
+          ) &&
           u.password === pwd
         );
+        if (!user) {
+          const submitBtn = e.target.querySelector('button[type="submit"]');
+          const origText = submitBtn ? submitBtn.textContent : '';
+          if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Signing in...'; }
+          try {
+            const res = await fetch('/api/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ident, password: pwd, role: session.roleSelection })
+            });
+            const data = await res.json();
+            if (res.ok && data && data.ok && data.user) {
+              user = data.user;
+              const idx = db.users.findIndex(u => u.id === user.id);
+              if (idx >= 0) db.users[idx] = user;
+              else db.users.push(user);
+              saveDB(true);
+            }
+          } catch (_) {}
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = origText; }
+        }
         if (!user) {
           toast('Invalid credentials for selected role');
           return;
         }
         loginUser(user);
+        if (typeof syncLiveUserSubscription === 'function') syncLiveUserSubscription();
       });
 
       // Register Submit
@@ -2276,6 +2307,7 @@
             createdAt: Date.now()
           };
           db.users.push(newUser);
+          fetch('/api/register-sync', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user: newUser }) }).catch(() => {});
           saveDB();
           toast('Account created');
           loginUser(newUser);
