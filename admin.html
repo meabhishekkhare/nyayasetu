@@ -418,7 +418,7 @@
           if (apiData && apiData.ok && apiData.payload && Array.isArray(apiData.payload.users)) {
             db = apiData.payload;
             ensureDbShape();
-            localStorage.setItem(DB_KEY, JSON.stringify(db));
+            try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch (_) {}
             const pill = document.getElementById('cloud-status-pill');
             if (pill) {
               pill.textContent = 'Live Cloud (Supabase)';
