@@ -3,1084 +3,369 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="robots" content="noindex, nofollow" />
-  <title>NyayaSetu • Restricted Admin Control</title>
+  <title>NyayaSetu • Admin Control</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body { font-family: Inter, system-ui, -apple-system, sans-serif; background: #0f172a; color: #0f172a; }
-  </style>
 </head>
-<body class="min-h-screen flex flex-col bg-slate-100">
-  <!-- Header -->
-  <header class="bg-slate-950 text-white sticky top-0 z-30 border-b border-slate-800 shadow-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+  <header class="bg-black text-white border-b border-zinc-800 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-blue-600 text-white font-black flex items-center justify-center shadow">NS</div>
+        <div class="w-9 h-9 rounded-xl bg-white text-black font-black flex items-center justify-center text-sm">NS</div>
         <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-base sm:text-lg font-bold tracking-tight">NyayaSetu Admin Control</h1>
-            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-rose-950 text-rose-200 border border-rose-700/60">Private Portal</span>
-          </div>
-          <p class="text-xs text-slate-400">Independent Operations, Advisor Verification, Dynamic Subscriptions &amp; UPI Ledger</p>
+          <h1 class="text-base font-bold">NyayaSetu Admin Control</h1>
+          <p class="text-[11px] text-zinc-400">Single Supabase Store • Live Rules, UPI &amp; Relational Inspector</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <span id="cloud-status-pill" class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">Local Preview</span>
-        <button id="btn-admin-logout" type="button" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600 text-white hover:bg-rose-500">Lock &amp; Logout</button>
+        <a href="/" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 hover:bg-zinc-700">Open App</a>
+        <button id="btn-refresh" type="button" class="hidden px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500">Refresh</button>
+        <button id="btn-logout" type="button" class="hidden px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-600 hover:bg-rose-500">Logout</button>
       </div>
     </div>
   </header>
 
-  <div id="toast" class="hidden fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-sm font-medium border border-slate-700"></div>
-
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
-    <!-- SECURE ADMIN LOGIN GATE -->
-    <section id="admin-login-box" class="max-w-md mx-auto mt-10 bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-lg space-y-4">
-      <div class="text-center space-y-1">
-        <span class="inline-block px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-slate-900 text-blue-400">Restricted Access</span>
-        <h2 class="text-xl font-extrabold text-slate-900">Admin Security Gate</h2>
-        <p class="text-xs text-slate-500">Enter your Admin ID, Passcode, and 4-digit Security PIN.</p>
+  <main id="admin-login-view" class="max-w-md mx-auto px-4 py-14">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+      <div>
+        <h2 class="text-lg font-bold">Admin Sign In</h2>
+        <p class="text-xs text-slate-500 mt-0.5">Default: admin@nyayasetu.in • admin123 • PIN 2026</p>
       </div>
-      <form id="form-admin-login" class="space-y-3.5">
-        <div>
-          <label for="admin-user" class="block text-xs font-semibold text-slate-700 mb-1">Admin ID</label>
-          <input id="admin-user" type="email" required placeholder="admin@nyayasetu.in" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm" />
-        </div>
-        <div>
-          <label for="admin-pass" class="block text-xs font-semibold text-slate-700 mb-1">Passcode</label>
-          <input id="admin-pass" type="password" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm" />
-        </div>
-        <div>
-          <label for="admin-pin" class="block text-xs font-semibold text-slate-700 mb-1">Security PIN (4 digits)</label>
-          <input id="admin-pin" type="password" inputmode="numeric" maxlength="6" required placeholder="••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono tracking-widest" />
-        </div>
-        <button type="submit" class="w-full py-2.5 rounded-xl bg-slate-900 text-white text-sm font-bold hover:bg-slate-800 transition">
-          Unlock Admin Console
-        </button>
+      <form id="form-admin-login" class="space-y-3">
+        <input id="login-id" type="text" required placeholder="Admin ID (admin@nyayasetu.in)" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
+        <input id="login-pass" type="password" required placeholder="Passcode" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
+        <input id="login-pin" type="password" required placeholder="Security PIN" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
+        <p id="login-err" class="text-xs text-rose-600 font-semibold hidden"></p>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-black text-white text-sm font-bold hover:bg-zinc-800">Unlock Admin Portal</button>
       </form>
-      <p class="text-[11px] text-center text-slate-400">Default credentials: <code class="font-mono">admin@nyayasetu.in</code> / <code class="font-mono">admin123</code> / PIN <code class="font-mono">2026</code> (changeable inside Security tab).</p>
+    </div>
+  </main>
+
+  <main id="admin-dash-view" class="hidden max-w-7xl mx-auto px-4 py-6 space-y-5">
+    <div id="status-toast" class="hidden px-4 py-2.5 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-300"></div>
+
+    <div class="flex flex-wrap gap-2">
+      <button type="button" data-tab="overview" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-black text-white">Overview</button>
+      <button type="button" data-tab="inspector" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700">Relational Data Inspector</button>
+      <button type="button" data-tab="payments" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700">UTR Verification <span id="badge-pending" class="ml-1 px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px]">0</span></button>
+      <button type="button" data-tab="rules" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700">Subscription Rules &amp; UPI</button>
+      <button type="button" data-tab="security" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700">Admin Security</button>
+    </div>
+
+    <section id="tab-overview" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div class="bg-white p-4 rounded-2xl border border-slate-200"><p class="text-[11px] font-semibold text-slate-500">Total Users</p><p id="m-users" class="text-2xl font-black mt-1">0</p></div>
+      <div class="bg-white p-4 rounded-2xl border border-slate-200"><p class="text-[11px] font-semibold text-slate-500">Clients</p><p id="m-clients" class="text-2xl font-black mt-1">0</p></div>
+      <div class="bg-white p-4 rounded-2xl border border-slate-200"><p class="text-[11px] font-semibold text-slate-500">Advisors</p><p id="m-advisors" class="text-2xl font-black mt-1">0</p></div>
+      <div class="bg-white p-4 rounded-2xl border border-slate-200"><p class="text-[11px] font-semibold text-slate-500">Open Cases</p><p id="m-cases" class="text-2xl font-black mt-1">0</p></div>
+      <div class="bg-white p-4 rounded-2xl border border-slate-200"><p class="text-[11px] font-semibold text-slate-500">Pending UTRs</p><p id="m-pending" class="text-2xl font-black text-amber-600 mt-1">0</p></div>
+      <div class="bg-white p-4 rounded-2xl border border-slate-200"><p class="text-[11px] font-semibold text-slate-500">Verified Revenue</p><p id="m-rev" class="text-2xl font-black text-emerald-700 mt-1">₹0</p></div>
     </section>
 
-    <!-- ADMIN DASHBOARD -->
-    <section id="admin-dashboard" class="hidden space-y-6">
-      <!-- Top Bar & Nav Tabs -->
-      <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
-        <div class="flex flex-wrap gap-2">
-          <button type="button" data-admin-tab="overview" class="admin-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white">Overview &amp; Metrics</button>
-          <button type="button" data-admin-tab="verification" class="admin-tab-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">Advisor Verification</button>
-          <button type="button" data-admin-tab="subscriptions" class="admin-tab-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">Subscription Rules &amp; UPI</button>
-          <button type="button" data-admin-tab="payments" class="admin-tab-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">UPI Payments</button>
-          <button type="button" data-admin-tab="utr" class="admin-tab-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">UTR Verification</button>
-          <button type="button" data-admin-tab="database" class="admin-tab-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">Cloud DB &amp; Security</button>
-        </div>
-        <div class="flex flex-wrap gap-2">
-          <button id="btn-sync-now" type="button" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-blue-600 text-white hover:bg-blue-500">Sync Cloud DB</button>
-          <button id="btn-export-db" type="button" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-white">Export JSON</button>
-        </div>
+    <section id="tab-inspector" class="hidden space-y-5">
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
+        <h3 class="text-sm font-bold">Add Client or Legal Advisor</h3>
+        <form id="form-add-user" class="grid grid-cols-1 sm:grid-cols-4 gap-2.5 text-xs">
+          <select id="add-role" class="px-3 py-2 rounded-xl border border-slate-300 font-semibold"><option value="client">Client</option><option value="advisor">Legal Advisor</option></select>
+          <input id="add-name" type="text" required placeholder="Full Name" class="px-3 py-2 rounded-xl border border-slate-300" />
+          <input id="add-email" type="email" required placeholder="Email" class="px-3 py-2 rounded-xl border border-slate-300" />
+          <input id="add-phone" type="text" required placeholder="Phone (10 digits)" class="px-3 py-2 rounded-xl border border-slate-300" />
+          <input id="add-pass" type="text" required placeholder="Password" value="pass123" class="px-3 py-2 rounded-xl border border-slate-300" />
+          <input id="add-city" type="text" required placeholder="City" class="px-3 py-2 rounded-xl border border-slate-300" />
+          <input id="add-state" type="text" required placeholder="State" class="px-3 py-2 rounded-xl border border-slate-300" />
+          <input id="add-pin" type="text" required placeholder="PIN (6 digits)" class="px-3 py-2 rounded-xl border border-slate-300" />
+          <input id="add-licence" type="text" placeholder="Bar Licence (Advisors)" class="px-3 py-2 rounded-xl border border-slate-300" />
+          <input id="add-exp" type="number" placeholder="Years Exp (Advisors)" class="px-3 py-2 rounded-xl border border-slate-300" />
+          <input id="add-spec" type="text" placeholder="Specialisations (comma sep)" class="px-3 py-2 rounded-xl border border-slate-300" />
+          <button type="submit" class="px-4 py-2 rounded-xl bg-black text-white font-bold hover:bg-zinc-800">+ Add User to Cloud</button>
+        </form>
       </div>
 
-      <!-- TAB 1: OVERVIEW & METRICS -->
-      <div id="tab-overview" class="admin-tab-panel space-y-6">
-        <div>
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Client Registration &amp; Conversion Metrics</h3>
-          <div id="admin-client-metrics" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"></div>
-        </div>
-        <div>
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Legal Advisor Registration &amp; Conversion Metrics</h3>
-          <div id="admin-advisor-metrics" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3"></div>
-        </div>
-        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-3">
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <h3 class="text-base font-bold text-slate-900">Relational Data Inspector</h3>
-            <div class="flex flex-wrap gap-2">
-              <button type="button" data-db-tab="users" class="db-tab-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-900 text-white">Users</button>
-              <button type="button" data-db-tab="cases" class="db-tab-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">Cases</button>
-              <button type="button" data-db-tab="messages" class="db-tab-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700">Case Mail</button>
-            </div>
-          </div>
-          <div id="admin-db-table" class="overflow-x-auto"></div>
-        </div>
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 space-y-3 overflow-x-auto">
+        <div class="flex items-center justify-between"><h3 class="text-sm font-bold">Users Table (with Date &amp; Timestamp)</h3><span id="users-count" class="text-xs text-slate-500"></span></div>
+        <table class="w-full text-left text-xs border-collapse">
+          <thead><tr class="border-b border-slate-200 text-slate-500"><th class="py-2 pr-3">Created Date &amp; Time</th><th class="py-2 pr-3">Name / Email</th><th class="py-2 pr-3">Role</th><th class="py-2 pr-3">Location</th><th class="py-2 pr-3">Credits / Plan</th><th class="py-2">Action</th></tr></thead>
+          <tbody id="tbody-users" class="divide-y divide-slate-100"></tbody>
+        </table>
       </div>
 
-      <!-- TAB 2: ADVISOR VERIFICATION -->
-      <div id="tab-verification" class="admin-tab-panel hidden space-y-4">
-        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
-          <div class="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h3 class="text-base font-bold text-slate-900">Advisor Verification &amp; Client Visibility</h3>
-              <p class="text-xs text-slate-500">Enable or disable each Legal Advisor's visibility in client search results and case matching.</p>
-            </div>
-            <div class="flex gap-2">
-              <select id="verify-filter" class="px-3 py-1.5 rounded-xl border border-slate-300 text-xs font-semibold bg-white">
-                <option value="all">All Advisors</option>
-                <option value="verified">Verified (Visible)</option>
-                <option value="pending">Disabled / Pending</option>
-              </select>
-            </div>
-          </div>
-          <div id="advisor-verification-list" class="space-y-3"></div>
-        </div>
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 space-y-3 overflow-x-auto">
+        <div class="flex items-center justify-between"><h3 class="text-sm font-bold">Cases Table (with Date &amp; Timestamp)</h3><span id="cases-count" class="text-xs text-slate-500"></span></div>
+        <table class="w-full text-left text-xs border-collapse">
+          <thead><tr class="border-b border-slate-200 text-slate-500"><th class="py-2 pr-3">Created Date &amp; Time</th><th class="py-2 pr-3">Case ID</th><th class="py-2 pr-3">Subject &amp; Law</th><th class="py-2 pr-3">City / PIN</th><th class="py-2">Action</th></tr></thead>
+          <tbody id="tbody-cases" class="divide-y divide-slate-100"></tbody>
+        </table>
       </div>
+    </section>
 
-      <!-- TAB 3: DYNAMIC SUBSCRIPTION RULES & UPI CONFIG -->
-      <div id="tab-subscriptions" class="admin-tab-panel hidden space-y-6">
-        <!-- Merchant UPI / GPay Config -->
-        <div class="bg-white rounded-2xl border border-blue-200 p-5 shadow-sm space-y-3">
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <h3 class="text-base font-bold text-slate-900">GPay / UPI Merchant Settings</h3>
-              <p class="text-xs text-slate-500">Used by the backend payment link generator (<code class="font-mono">/api/create-payment</code>) and live QR/deep-links.</p>
-            </div>
-            <button id="btn-save-upi-cfg" type="button" class="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white hover:bg-blue-500">Save UPI Settings</button>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label for="cfg-upi-vpa" class="block text-xs font-semibold text-slate-700 mb-1">Merchant UPI ID (VPA) *</label>
-              <input id="cfg-upi-vpa" type="text" placeholder="nyayasetu@okicici" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-mono" />
-            </div>
-            <div>
-              <label for="cfg-upi-name" class="block text-xs font-semibold text-slate-700 mb-1">Merchant Display Name *</label>
-              <input id="cfg-upi-name" type="text" placeholder="NyayaSetu Legal" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
-            </div>
-          </div>
+    <section id="tab-payments" class="hidden bg-white rounded-2xl border border-slate-200 p-5 space-y-3 overflow-x-auto">
+      <h3 class="text-sm font-bold">UPI / UTR Payment Verification</h3>
+      <table class="w-full text-left text-xs border-collapse">
+        <thead><tr class="border-b border-slate-200 text-slate-500"><th class="py-2 pr-3">Date &amp; Time</th><th class="py-2 pr-3">User</th><th class="py-2 pr-3">Plan</th><th class="py-2 pr-3">Amount</th><th class="py-2 pr-3">UTR</th><th class="py-2 pr-3">Status</th><th class="py-2">Action</th></tr></thead>
+        <tbody id="tbody-payments" class="divide-y divide-slate-100"></tbody>
+      </table>
+    </section>
+
+    <section id="tab-rules" class="hidden bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
+      <h3 class="text-sm font-bold">Live Merchant UPI &amp; Subscription Plans</h3>
+      <form id="form-rules" class="space-y-4 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div><label class="block font-semibold mb-1">Merchant UPI ID (VPA)</label><input id="rule-upi-vpa" type="text" required class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono" /></div>
+          <div><label class="block font-semibold mb-1">Merchant Display Name</label><input id="rule-upi-name" type="text" required class="w-full px-3 py-2 rounded-xl border border-slate-300" /></div>
         </div>
+        <div id="plans-editor" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        <button type="submit" class="px-5 py-2.5 rounded-xl bg-black text-white font-bold hover:bg-zinc-800">Save &amp; Publish Live Rules</button>
+      </form>
+    </section>
 
-        <!-- Client & Advisor Dynamic Rules -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Client Subscription Rules -->
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
-            <div class="flex items-center justify-between">
-              <div>
-                <h3 class="text-base font-bold text-blue-950">Client Subscription Rules</h3>
-                <p class="text-xs text-slate-500">Controls free advisor contact unlocks, push timing, and paid plans.</p>
-              </div>
-              <button id="btn-add-client-plan" type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100">+ Add Plan</button>
-            </div>
-            <div class="grid grid-cols-2 gap-3 bg-blue-50/70 p-3 rounded-xl border border-blue-100">
-              <div>
-                <label for="cli-free-contacts" class="block text-xs font-semibold text-slate-700 mb-1">Free Contacts Allowance</label>
-                <input id="cli-free-contacts" type="number" min="0" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-sm font-bold bg-white" />
-              </div>
-              <div>
-                <label for="cli-push-after" class="block text-xs font-semibold text-slate-700 mb-1">Push Subscription After # View</label>
-                <input id="cli-push-after" type="number" min="0" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-sm font-bold bg-white" />
-              </div>
-            </div>
-            <div id="client-plans-editor" class="space-y-3"></div>
-            <button id="btn-save-client-rules" type="button" class="w-full py-2.5 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-500">Save Client Subscription Rules</button>
-          </div>
-
-          <!-- Advisor Subscription Rules -->
-          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
-            <div class="flex items-center justify-between">
-              <div>
-                <h3 class="text-base font-bold text-zinc-900">Legal Advisor Subscription Rules</h3>
-                <p class="text-xs text-slate-500">Controls free client contact unlocks, push timing, and pool/notified plans.</p>
-              </div>
-              <button id="btn-add-advisor-plan" type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-100 text-zinc-800 border border-zinc-300 hover:bg-zinc-200">+ Add Plan</button>
-            </div>
-            <div class="grid grid-cols-2 gap-3 bg-zinc-50 p-3 rounded-xl border border-zinc-200">
-              <div>
-                <label for="adv-free-contacts" class="block text-xs font-semibold text-slate-700 mb-1">Free Contacts Allowance</label>
-                <input id="adv-free-contacts" type="number" min="0" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-sm font-bold bg-white" />
-              </div>
-              <div>
-                <label for="adv-push-after" class="block text-xs font-semibold text-slate-700 mb-1">Push Subscription After # View</label>
-                <input id="adv-push-after" type="number" min="0" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 text-sm font-bold bg-white" />
-              </div>
-            </div>
-            <div id="advisor-plans-editor" class="space-y-3"></div>
-            <button id="btn-save-advisor-rules" type="button" class="w-full py-2.5 rounded-xl bg-zinc-900 text-white text-xs font-bold hover:bg-zinc-800">Save Advisor Subscription Rules</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 4: UPI PAYMENTS LEDGER -->
-      <div id="tab-payments" class="admin-tab-panel hidden space-y-4">
-        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <h3 class="text-base font-bold text-slate-900">GPay / UPI Payment Transactions</h3>
-              <p class="text-xs text-slate-500">Verify pending UPI UTRs or audit completed subscription activations.</p>
-            </div>
-            <span id="payments-total-pill" class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">₹0 Verified</span>
-          </div>
-          <div id="admin-payments-table" class="overflow-x-auto"></div>
-        </div>
-      </div>
-
-      <!-- TAB 5: CLOUD DB & SECURITY -->
-      <div id="tab-database" class="admin-tab-panel hidden space-y-6">
-        <div class="bg-white rounded-2xl border border-blue-200 p-5 shadow-sm space-y-4">
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <h3 class="text-base font-bold text-slate-900">Supabase / Firebase Cloud Database Connection</h3>
-              <p class="text-xs text-slate-500">Syncs users, advisor verifications, dynamic subscription rules, and UPI payments across devices.</p>
-            </div>
-            <span id="cloud-panel-status" class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700">Not Connected</span>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
-            <div class="md:col-span-3">
-              <label for="cloud-provider" class="block text-xs font-semibold text-slate-700 mb-1">Provider</label>
-              <select id="cloud-provider" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white font-medium">
-                <option value="supabase">Supabase (Postgres REST)</option>
-                <option value="firebase">Firebase Realtime DB</option>
-              </select>
-            </div>
-            <div class="md:col-span-5">
-              <label for="cloud-url" class="block text-xs font-semibold text-slate-700 mb-1">Database HTTPS URL</label>
-              <input id="cloud-url" type="url" placeholder="https://xxxx.supabase.co" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs" />
-            </div>
-            <div class="md:col-span-4">
-              <label for="cloud-key" class="block text-xs font-semibold text-slate-700 mb-1">Anon / Service Key</label>
-              <input id="cloud-key" type="password" placeholder="Supabase anon key" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs" />
-            </div>
-          </div>
-          <div class="flex flex-wrap gap-2">
-            <button id="btn-cloud-connect" type="button" class="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white hover:bg-blue-500">Save &amp; Sync Online DB</button>
-            <button id="btn-cloud-disconnect" type="button" class="px-3 py-2 rounded-xl text-xs font-semibold text-rose-600 hover:bg-rose-50">Disconnect</button>
-            <button id="btn-reset-db" type="button" class="px-3 py-2 rounded-xl text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 ml-auto">Reset Demo DB</button>
-          </div>
-        </div>
-
-        <!-- Admin Security Credentials -->
-        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
-          <h3 class="text-base font-bold text-slate-900">Admin Credentials &amp; Security PIN</h3>
-          <form id="form-admin-security" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label for="sec-admin-id" class="block text-xs font-semibold text-slate-700 mb-1">Admin ID</label>
-              <input id="sec-admin-id" type="email" required class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
-            </div>
-            <div>
-              <label for="sec-admin-pass" class="block text-xs font-semibold text-slate-700 mb-1">New Passcode</label>
-              <input id="sec-admin-pass" type="password" required minlength="6" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm" />
-            </div>
-            <div>
-              <label for="sec-admin-pin" class="block text-xs font-semibold text-slate-700 mb-1">New Security PIN</label>
-              <input id="sec-admin-pin" type="password" inputmode="numeric" required minlength="4" maxlength="6" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-mono" />
-            </div>
-            <div class="sm:col-span-3 flex justify-end">
-              <button type="submit" class="px-5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800">Update Security Credentials</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!-- TAB 6: UTR VERIFICATION -->
-      <div id="tab-utr" class="admin-tab-panel hidden space-y-4">
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-4">
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <h3 class="text-base font-bold text-slate-900">UTR Verification &amp; Auto-Activation</h3>
-              <p class="text-xs text-slate-500">Toggle UTR verification ON to confirm payment and automatically enable the user's subscription plan.</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <input id="utr-search" type="text" placeholder="Search Txn ID, UTR, or User ID..." class="px-3 py-1.5 rounded-xl border border-slate-300 text-xs" />
-              <button id="btn-refresh-utr" type="button" class="px-3 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800">Refresh Ledger</button>
-            </div>
-          </div>
-          <div id="utr-ledger-list" class="overflow-x-auto text-xs text-slate-600">Loading UPI transactions...</div>
-        </div>
-      </div>
-
+    <section id="tab-security" class="hidden bg-white rounded-2xl border border-slate-200 p-5 max-w-md space-y-3">
+      <h3 class="text-sm font-bold">Admin Security Credentials</h3>
+      <form id="form-security" class="space-y-3 text-xs">
+        <div><label class="block font-semibold mb-1">Admin ID</label><input id="sec-id" type="text" required class="w-full px-3 py-2 rounded-xl border border-slate-300" /></div>
+        <div><label class="block font-semibold mb-1">Passcode</label><input id="sec-pass" type="text" required class="w-full px-3 py-2 rounded-xl border border-slate-300" /></div>
+        <div><label class="block font-semibold mb-1">Security PIN</label><input id="sec-pin" type="text" required class="w-full px-3 py-2 rounded-xl border border-slate-300" /></div>
+        <button type="submit" class="px-5 py-2.5 rounded-xl bg-black text-white font-bold hover:bg-zinc-800">Save Security Credentials</button>
+      </form>
     </section>
   </main>
 
   <script>
-    const DB_KEY = 'nyayasetu_platform_db_v2';
-    const CLOUD_CFG_KEY = 'nyayasetu_cloud_cfg_v1';
-    const ADMIN_AUTH_KEY = 'nyayasetu_admin_session_v1';
+    let db = { users: [], cases: [], messages: [], notifications: [], payments: [], subscriptionRules: null, adminSecurity: { adminId: 'admin@nyayasetu.in', passcode: 'admin123', pin: '2026' } };
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    const fmtTs = iso => { if (!iso) return '—'; try { return new Date(iso).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }); } catch { return iso; } };
 
-    let db = null;
-    let cloudCfg = { provider: 'supabase', url: '', key: '' };
-    let currentDbTab = 'users';
-
-    function defaultSubscriptionRules() {
+    function defaultRules() {
       return {
-        upiVpa: 'nyayasetu@okicici',
-        upiName: 'NyayaSetu Legal',
-        client: {
-          freeContacts: 3,
-          pushAfterContacts: 2,
-          plans: [
-            { id: 'cli_pay_per_contact', name: 'Single Contact Unlock', priceInr: 9, credits: 1, durationDays: 0, scope: 'per_contact', enabled: true, description: '₹9 per advisor contact accessibility' },
-            { id: 'cli_pack_5', name: '5 Contacts Pack', priceInr: 29, credits: 5, durationDays: 0, scope: 'pack', enabled: true, description: '₹29 for 5 more advisor contacts' },
-            { id: 'cli_pack_20', name: '20 Contacts Pack', priceInr: 99, credits: 20, durationDays: 0, scope: 'pack', enabled: true, description: '₹99 for 20 advisor contacts' },
-            { id: 'cli_unlimited_28d', name: '28-Day Unlimited Access', priceInr: 149, credits: 999999, durationDays: 28, scope: 'all_unlimited', enabled: true, description: '₹149 for 28 days free accessibility to all contacts' }
-          ]
-        },
-        advisor: {
-          freeContacts: 1,
-          pushAfterContacts: 1,
-          plans: [
-            { id: 'adv_pay_per_contact', name: 'Single Contact Unlock', priceInr: 5, credits: 1, durationDays: 0, scope: 'per_contact', enabled: true, description: '₹5 to access each client contact' },
-            { id: 'adv_monthly_5', name: 'Monthly 5 Pool Contacts', priceInr: 9, credits: 5, durationDays: 30, scope: 'pool', enabled: true, description: '₹9/month to access 5 contacts from the complaint pool' },
-            { id: 'adv_monthly_notified', name: 'Monthly Unlimited Notified', priceInr: 149, credits: 999999, durationDays: 30, scope: 'notified_unlimited', enabled: true, description: '₹149/month unlimited contacts of all notified or client-reached-out cases' },
-            { id: 'adv_28d_100', name: '28-Day 100 Pool Contacts', priceInr: 599, credits: 100, durationDays: 28, scope: 'pool', enabled: true, description: '₹599 for 28 days subscription to 100 contact views from pool' }
-          ]
-        }
+        upiVpa: 'nyayasetu@upi', upiName: 'NyayaSetu Legal Directory',
+        client: [
+          { id: 'cli_single', name: 'Single Contact Unlock', priceInr: 1, credits: 1, durationDays: 0, enabled: true, description: '₹1 one-time unlock for 1 advisor contact' },
+          { id: 'cli_28d_5', name: '28-Day 5 Contacts Plan', priceInr: 49, credits: 5, durationDays: 28, enabled: true, description: '₹49 for 28 days • 5 advisor contacts' },
+          { id: 'cli_28d_10', name: '28-Day 10 Contacts Plan', priceInr: 99, credits: 10, durationDays: 28, enabled: true, description: '₹99 for 28 days • 10 advisor contacts' }
+        ],
+        advisor: [
+          { id: 'adv_1m_5', name: '1-Month Starter (5 Contacts)', priceInr: 199, credits: 5, durationDays: 30, enabled: true, description: '₹199/mo • 5 client unlocks' },
+          { id: 'adv_1m_25', name: '1-Month Growth (25 Contacts)', priceInr: 499, credits: 25, durationDays: 30, enabled: true, description: '₹499/mo • 25 client unlocks' },
+          { id: 'adv_3m_100', name: '3-Month Pro (100 Contacts)', priceInr: 999, credits: 100, durationDays: 90, enabled: true, description: '₹999/3mo • 100 client unlocks' }
+        ]
       };
     }
 
-    function ensureDbShape() {
-      if (!db || !Array.isArray(db.users)) db = { users: [], cases: [], messages: [], notifications: [], payments: [], funnelStats: {} };
-      if (!db.subscriptionRules) db.subscriptionRules = defaultSubscriptionRules();
-      if (!db.payments) db.payments = [];
-      if (!db.adminSecurity) db.adminSecurity = { adminId: 'admin@nyayasetu.in', passcode: 'admin123', pin: '2026' };
-      db.users.forEach(u => {
-        if (u.role === 'advisor' && typeof u.advisorVerified !== 'boolean') u.advisorVerified = true;
-        if (typeof u.contactCreditsRemaining !== 'number') u.contactCreditsRemaining = 0;
-        if (!Array.isArray(u.unlockedContactIds)) u.unlockedContactIds = [];
-      });
-    }
-
-    function esc(s) {
-      return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    }
-
     function toast(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.remove('hidden');
-      clearTimeout(t._timer);
-      t._timer = setTimeout(() => t.classList.add('hidden'), 2800);
+      const el = document.getElementById('status-toast');
+      el.textContent = msg; el.classList.remove('hidden');
+      setTimeout(() => el.classList.add('hidden'), 3500);
     }
 
-    function loadCloudCfg() {
-      try {
-        const raw = localStorage.getItem(CLOUD_CFG_KEY);
-        if (raw) cloudCfg = JSON.parse(raw);
-      } catch (e) {}
-      updateCloudStatusUI();
-    }
-
-    function updateCloudStatusUI() {
-      const connected = Boolean(cloudCfg && cloudCfg.url && cloudCfg.url.startsWith('https://'));
-      const pill = document.getElementById('cloud-status-pill');
-      const panelStatus = document.getElementById('cloud-panel-status');
-      if (pill) {
-        pill.textContent = connected ? `Cloud DB: ${cloudCfg.provider.toUpperCase()}` : 'Local Preview';
-        pill.className = connected
-          ? 'px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-900/70 text-emerald-200 border border-emerald-700'
-          : 'px-2.5 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700';
-      }
-      if (panelStatus) {
-        panelStatus.textContent = connected ? `Connected (${cloudCfg.provider.toUpperCase()})` : 'Not Connected';
-        panelStatus.className = connected
-          ? 'px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800'
-          : 'px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700';
-      }
-      if (document.getElementById('cloud-provider') && cloudCfg.provider) document.getElementById('cloud-provider').value = cloudCfg.provider;
-      if (document.getElementById('cloud-url') && cloudCfg.url) document.getElementById('cloud-url').value = cloudCfg.url;
-      if (document.getElementById('cloud-key') && cloudCfg.key) document.getElementById('cloud-key').value = cloudCfg.key;
-    }
-
-    async function syncToCloud() {
-      if (!db || !Array.isArray(db.users) || db.users.length === 0) return;
-      try {
-        await fetch('/api/admin-db', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ payload: db })
-        });
-      } catch (_) {}
-      if (!cloudCfg || !cloudCfg.url || !cloudCfg.url.startsWith('https://')) return;
-      const base = cloudCfg.url.replace(/\/+$/, '');
-      try {
-        if (cloudCfg.provider === 'firebase') {
-          const authQ = cloudCfg.key ? `?auth=${encodeURIComponent(cloudCfg.key)}` : '';
-          await fetch(`${base}/nyayasetu_db.json${authQ}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(db)
-          });
-        } else {
-          await fetch(`${base}/rest/v1/nyayasetu_store`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'apikey': cloudCfg.key,
-              'Authorization': `Bearer ${cloudCfg.key}`,
-              'Prefer': 'resolution=merge-duplicates'
-            },
-            body: JSON.stringify({ id: 'main', payload: db, updated_at: new Date().toISOString() })
-          });
-        }
-      } catch (e) {
-        toast('Cloud sync failed; check URL / key');
+    async function loadCloud() {
+      const res = await fetch('/api/admin-db?t=' + Date.now());
+      const data = await res.json();
+      if (data && data.payload) {
+        db = { users: [], cases: [], messages: [], notifications: [], payments: [], ...data.payload };
+        if (!db.subscriptionRules) db.subscriptionRules = defaultRules();
+        if (!db.adminSecurity) db.adminSecurity = { adminId: 'admin@nyayasetu.in', passcode: 'admin123', pin: '2026' };
       }
     }
 
-    async function pullFromCloud() {
-      try {
-        const apiRes = await fetch('/api/admin-db');
-        if (apiRes.ok) {
-          const apiData = await apiRes.json();
-          if (apiData && apiData.ok && apiData.payload && Array.isArray(apiData.payload.users)) {
-            db = apiData.payload;
-            ensureDbShape();
-            try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch (_) {}
-            const pill = document.getElementById('cloud-status-pill');
-            if (pill) {
-              pill.textContent = 'Live Cloud (Supabase)';
-              pill.className = 'px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-900/60 text-emerald-200 border border-emerald-700';
-            }
-            return true;
-          }
-        }
-      } catch (_) {}
-      if (!cloudCfg || !cloudCfg.url || !cloudCfg.url.startsWith('https://')) return false;
-      const base = cloudCfg.url.replace(/\/+$/, '');
-      try {
-        if (cloudCfg.provider === 'firebase') {
-          const authQ = cloudCfg.key ? `?auth=${encodeURIComponent(cloudCfg.key)}` : '';
-          const res = await fetch(`${base}/nyayasetu_db.json${authQ}`);
-          const data = await res.json();
-          if (data && Array.isArray(data.users)) {
-            db = data;
-            ensureDbShape();
-            localStorage.setItem(DB_KEY, JSON.stringify(db));
-            return true;
-          }
-        } else {
-          const res = await fetch(`${base}/rest/v1/nyayasetu_store?id=eq.main&select=payload`, {
-            headers: { 'apikey': cloudCfg.key, 'Authorization': `Bearer ${cloudCfg.key}` }
-          });
-          const rows = await res.json();
-          if (Array.isArray(rows) && rows[0] && rows[0].payload && Array.isArray(rows[0].payload.users)) {
-            db = rows[0].payload;
-            ensureDbShape();
-            localStorage.setItem(DB_KEY, JSON.stringify(db));
-            return true;
-          }
-        }
-      } catch (e) {}
-      return false;
-    }
-
-    function loadDB() {
-      loadCloudCfg();
-      try {
-        const raw = localStorage.getItem(DB_KEY);
-        if (raw) db = JSON.parse(raw);
-      } catch (e) {}
-      ensureDbShape();
-    }
-
-    function saveDB(skipCloud = false) {
-      ensureDbShape();
-      localStorage.setItem(DB_KEY, JSON.stringify(db));
-      if (!skipCloud) syncToCloud();
-    }
-
-    function switchAdminTab(tab) {
-      document.querySelectorAll('.admin-tab-panel').forEach(p => p.classList.add('hidden'));
-      document.getElementById(`tab-${tab}`).classList.remove('hidden');
-      document.querySelectorAll('.admin-tab-btn').forEach(btn => {
-        const active = btn.getAttribute('data-admin-tab') === tab;
-        btn.className = active
-          ? 'admin-tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-white'
-          : 'admin-tab-btn px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200';
+    async function saveCloud(msg) {
+      const res = await fetch('/api/admin-db', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ payload: db })
       });
-      if (tab === 'overview') renderOverview();
-      if (tab === 'verification') renderAdvisorVerification();
-      if (tab === 'utr' && window.fetchUtrLedger) window.fetchUtrLedger();
-      if (tab === 'subscriptions') renderSubscriptionEditor();
-      if (tab === 'payments') renderPaymentsTable();
-      if (tab === 'database') loadSecurityForm();
+      if (!res.ok) throw new Error('Cloud save failed');
+      if (msg) toast(msg);
+      renderAll();
     }
 
-    function renderOverview() {
-      const clients = db.users.filter(u => u.role === 'client');
-      const advisors = db.users.filter(u => u.role === 'advisor');
-      const verifiedAdvisors = advisors.filter(a => a.advisorVerified !== false);
-      const paidUsers = db.users.filter(u => u.subscriptionPlan && u.subscriptionPlan !== 'free_starter');
-      const verifiedRevenue = db.payments.filter(p => p.status === 'verified').reduce((s, p) => s + Number(p.amountInr || 0), 0);
+    function renderAll() {
+      const users = db.users || [], cases = db.cases || [], pays = db.payments || [];
+      document.getElementById('m-users').textContent = users.length;
+      document.getElementById('m-clients').textContent = users.filter(u => u.role === 'client').length;
+      document.getElementById('m-advisors').textContent = users.filter(u => u.role === 'advisor').length;
+      document.getElementById('m-cases').textContent = cases.length;
+      const pend = pays.filter(p => p.status !== 'verified');
+      document.getElementById('m-pending').textContent = pend.length;
+      document.getElementById('badge-pending').textContent = pend.length;
+      const rev = pays.filter(p => p.status === 'verified').reduce((s, p) => s + Number(p.amountInr || 0), 0);
+      document.getElementById('m-rev').textContent = '₹' + rev;
 
-      const cliCards = [
-        { label: 'Total Clients', val: clients.length },
-        { label: 'Cases Filed', val: (db.cases || []).length },
-        { label: 'Paid Clients', val: clients.filter(c => c.subscriptionPlan !== 'free_starter').length },
-        { label: 'Case Mail Sent', val: (db.messages || []).length },
-        { label: 'Reg Visits', val: (db.funnelStats && db.funnelStats.clientRegistrationVisits) || 0 },
-        { label: 'UPI Revenue', val: '₹' + verifiedRevenue }
-      ];
-      document.getElementById('admin-client-metrics').innerHTML = cliCards.map(m => `
-        <div class="bg-white rounded-xl border border-slate-200 p-3 shadow-sm">
-          <p class="text-[11px] font-semibold text-slate-500">${m.label}</p>
-          <p class="text-xl font-extrabold text-slate-900 mt-0.5">${m.val}</p>
-        </div>
-      `).join('');
+      document.getElementById('users-count').textContent = `${users.length} total`;
+      document.getElementById('tbody-users').innerHTML = users.map(u => `
+        <tr>
+          <td class="py-2 pr-3 text-slate-500 whitespace-nowrap">${esc(fmtTs(u.createdAt))}</td>
+          <td class="py-2 pr-3"><div class="font-bold">${esc(u.name)}</div><div class="text-slate-500">${esc(u.email)} • ${esc(u.phone || '')}</div></td>
+          <td class="py-2 pr-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${u.role === 'advisor' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-800'}">${esc(u.role)}</span></td>
+          <td class="py-2 pr-3">${esc(u.city || '')}, ${esc(u.state || '')} (${esc(u.pin || '')})</td>
+          <td class="py-2 pr-3">${Number(u.contactCreditsRemaining || 0)} credits ${u.subscriptionPlanName ? '• ' + esc(u.subscriptionPlanName) : ''}</td>
+          <td class="py-2"><button type="button" data-del-user="${esc(u.id)}" class="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 font-bold hover:bg-rose-100">Delete</button></td>
+        </tr>`).join('') || '<tr><td colspan="6" class="py-4 text-center text-slate-400">No users yet.</td></tr>';
 
-      const advCards = [
-        { label: 'Total Advisors', val: advisors.length },
-        { label: 'Verified (Visible)', val: verifiedAdvisors.length },
-        { label: 'Pending / Hidden', val: advisors.length - verifiedAdvisors.length },
-        { label: 'Paid Advisors', val: advisors.filter(a => a.subscriptionPlan !== 'free_starter').length },
-        { label: 'Total Paid Users', val: paidUsers.length },
-        { label: 'Reg Visits', val: (db.funnelStats && db.funnelStats.advisorRegistrationVisits) || 0 }
-      ];
-      document.getElementById('admin-advisor-metrics').innerHTML = advCards.map(m => `
-        <div class="bg-white rounded-xl border border-slate-200 p-3 shadow-sm">
-          <p class="text-[11px] font-semibold text-slate-500">${m.label}</p>
-          <p class="text-xl font-extrabold text-slate-900 mt-0.5">${m.val}</p>
-        </div>
-      `).join('');
+      document.getElementById('cases-count').textContent = `${cases.length} total`;
+      document.getElementById('tbody-cases').innerHTML = cases.map(c => `
+        <tr>
+          <td class="py-2 pr-3 text-slate-500 whitespace-nowrap">${esc(fmtTs(c.createdAt))}</td>
+          <td class="py-2 pr-3 font-mono font-bold">${esc(c.caseNumber || c.id)}</td>
+          <td class="py-2 pr-3"><div class="font-bold">${esc(c.subject)}</div><div class="text-slate-500">${esc(c.suggestedLaw || c.caseType)}</div></td>
+          <td class="py-2 pr-3">${esc(c.city)} (${esc(c.pin)})</td>
+          <td class="py-2"><button type="button" data-del-case="${esc(c.id)}" class="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-700 font-bold hover:bg-rose-100">Delete</button></td>
+        </tr>`).join('') || '<tr><td colspan="5" class="py-4 text-center text-slate-400">No cases yet.</td></tr>';
 
-      renderDbTable(currentDbTab);
+      document.getElementById('tbody-payments').innerHTML = pays.slice().reverse().map(p => `
+        <tr>
+          <td class="py-2 pr-3 text-slate-500 whitespace-nowrap">${esc(fmtTs(p.createdAt))}</td>
+          <td class="py-2 pr-3"><div class="font-bold">${esc(p.userName || p.userId)}</div><div class="text-slate-500">${esc(p.role || '')}</div></td>
+          <td class="py-2 pr-3">${esc(p.planName || p.planId)}</td>
+          <td class="py-2 pr-3 font-bold">₹${esc(p.amountInr)}</td>
+          <td class="py-2 pr-3 font-mono">${esc(p.utr || '—')}</td>
+          <td class="py-2 pr-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${p.status === 'verified' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${esc(p.status || 'pending')}</span></td>
+          <td class="py-2">${p.status !== 'verified' ? `<button type="button" data-verify-pay="${esc(p.id)}" class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold hover:bg-emerald-500">Verify &amp; Credit</button>` : 'Verified'}</td>
+        </tr>`).join('') || '<tr><td colspan="7" class="py-4 text-center text-slate-400">No payments yet.</td></tr>';
+
+      const r = db.subscriptionRules || defaultRules();
+      document.getElementById('rule-upi-vpa').value = db.upiVpa || r.upiVpa || 'nyayasetu@upi';
+      document.getElementById('rule-upi-name').value = db.upiName || r.upiName || 'NyayaSetu Legal Directory';
+      document.getElementById('plans-editor').innerHTML = ['client', 'advisor'].map(role => `
+        <div class="border border-slate-200 rounded-xl p-3 space-y-2">
+          <h4 class="font-bold uppercase text-[11px] text-slate-500">${role} Plans</h4>
+          ${(r[role] || []).map((pl, idx) => `
+            <div class="grid grid-cols-4 gap-2 items-center bg-slate-50 p-2 rounded-lg">
+              <input data-plan-role="${role}" data-plan-idx="${idx}" data-plan-field="name" value="${esc(pl.name)}" class="col-span-2 px-2 py-1 rounded border border-slate-300" />
+              <input data-plan-role="${role}" data-plan-idx="${idx}" data-plan-field="priceInr" type="number" value="${esc(pl.priceInr)}" class="px-2 py-1 rounded border border-slate-300" title="Price INR" />
+              <input data-plan-role="${role}" data-plan-idx="${idx}" data-plan-field="credits" type="number" value="${esc(pl.credits)}" class="px-2 py-1 rounded border border-slate-300" title="Credits" />
+            </div>`).join('')}
+        </div>`).join('');
+
+      document.getElementById('sec-id').value = db.adminSecurity.adminId || '';
+      document.getElementById('sec-pass').value = db.adminSecurity.passcode || '';
+      document.getElementById('sec-pin').value = db.adminSecurity.pin || '';
     }
 
-    function renderDbTable(tab) {
-      currentDbTab = tab;
-      document.querySelectorAll('.db-tab-btn').forEach(b => {
-        const act = b.getAttribute('data-db-tab') === tab;
-        b.className = act ? 'db-tab-btn px-3 py-1 rounded-lg text-xs font-bold bg-slate-900 text-white' : 'db-tab-btn px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700';
-      });
-      const box = document.getElementById('admin-db-table');
-      if (tab === 'users') {
-        box.innerHTML = `<table class="w-full text-left text-xs">
-          <thead><tr class="border-b border-slate-200 text-slate-500"><th class="py-2 pr-3">Name</th><th class="py-2 pr-3">Role</th><th class="py-2 pr-3">City / PIN</th><th class="py-2 pr-3">Plan</th><th class="py-2 pr-3">Credits</th><th class="py-2">Verified</th></tr></thead>
-          <tbody>${db.users.map(u => `
-            <tr class="border-b border-slate-100">
-              <td class="py-2 pr-3 font-semibold">${esc(u.name)}</td>
-              <td class="py-2 pr-3 uppercase">${esc(u.role)}</td>
-              <td class="py-2 pr-3">${esc(u.city || '-')} (${esc(u.pin || '-')})</td>
-              <td class="py-2 pr-3 font-mono">${esc(u.subscriptionPlan || 'free_starter')}</td>
-              <td class="py-2 pr-3">${u.subscriptionScope && u.subscriptionScope.includes('unlimited') ? 'Unlimited' : (u.contactCreditsRemaining || 0)}</td>
-              <td class="py-2">${u.role === 'advisor' ? (u.advisorVerified !== false ? '<span class="text-emerald-700 font-bold">Yes</span>' : '<span class="text-rose-600 font-bold">Hidden</span>') : '-'}</td>
-            </tr>`).join('')}</tbody></table>`;
-      } else if (tab === 'cases') {
-        box.innerHTML = `<table class="w-full text-left text-xs">
-          <thead><tr class="border-b border-slate-200 text-slate-500"><th class="py-2 pr-3">Case #</th><th class="py-2 pr-3">Type</th><th class="py-2 pr-3">City / PIN</th><th class="py-2">Advisors Notified</th></tr></thead>
-          <tbody>${(db.cases || []).map(c => `
-            <tr class="border-b border-slate-100">
-              <td class="py-2 pr-3 font-mono font-bold">${esc(c.caseNumber)}</td>
-              <td class="py-2 pr-3">${esc(c.incidentType)}</td>
-              <td class="py-2 pr-3">${esc(c.city)} (${esc(c.pin)})</td>
-              <td class="py-2">${(c.unlockedAdvisors || []).length}</td>
-            </tr>`).join('')}</tbody></table>`;
+    document.getElementById('form-admin-login').addEventListener('submit', async e => {
+      e.preventDefault();
+      await loadCloud();
+      const id = document.getElementById('login-id').value.trim();
+      const pass = document.getElementById('login-pass').value.trim();
+      const pin = document.getElementById('login-pin').value.trim();
+      const sec = db.adminSecurity || { adminId: 'admin@nyayasetu.in', passcode: 'admin123', pin: '2026' };
+      if (id === sec.adminId && pass === sec.passcode && pin === sec.pin) {
+        sessionStorage.setItem('nyaya_admin_ok', '1');
+        document.getElementById('admin-login-view').classList.add('hidden');
+        document.getElementById('admin-dash-view').classList.remove('hidden');
+        document.getElementById('btn-refresh').classList.remove('hidden');
+        document.getElementById('btn-logout').classList.remove('hidden');
+        renderAll();
       } else {
-        box.innerHTML = `<table class="w-full text-left text-xs">
-          <thead><tr class="border-b border-slate-200 text-slate-500"><th class="py-2 pr-3">Subject</th><th class="py-2 pr-3">Body</th><th class="py-2">Time</th></tr></thead>
-          <tbody>${(db.messages || []).map(m => `
-            <tr class="border-b border-slate-100">
-              <td class="py-2 pr-3 font-semibold">${esc(m.subject)}</td>
-              <td class="py-2 pr-3 text-slate-600">${esc(m.body)}</td>
-              <td class="py-2 text-slate-400">${new Date(m.createdAt).toLocaleString()}</td>
-            </tr>`).join('')}</tbody></table>`;
+        const err = document.getElementById('login-err');
+        err.textContent = 'Invalid Admin ID, Passcode, or PIN.';
+        err.classList.remove('hidden');
       }
-    }
-
-    function renderAdvisorVerification() {
-      const filter = document.getElementById('verify-filter').value;
-      const advisors = db.users.filter(u => u.role === 'advisor').filter(a => {
-        const isVer = a.advisorVerified !== false;
-        if (filter === 'verified') return isVer;
-        if (filter === 'pending') return !isVer;
-        return true;
-      });
-      const list = document.getElementById('advisor-verification-list');
-      if (!advisors.length) {
-        list.innerHTML = '<p class="text-xs text-slate-500 py-4 text-center">No advisors match this filter.</p>';
-        return;
-      }
-      list.innerHTML = advisors.map(a => {
-        const isVer = a.advisorVerified !== false;
-        return `
-          <div class="border border-slate-200 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 bg-slate-50/70">
-            <div class="flex items-center gap-3">
-              ${a.photoDataUrl ? `<img src="${a.photoDataUrl}" alt="${esc(a.name)}" class="w-12 h-12 rounded-xl object-cover border border-slate-300" />` : `<div class="w-12 h-12 rounded-xl bg-slate-900 text-white font-bold flex items-center justify-center">${esc((a.name || 'A')[0])}</div>`}
-              <div>
-                <div class="flex flex-wrap items-center gap-2">
-                  <h4 class="text-sm font-bold text-slate-900">${esc(a.name)}</h4>
-                  <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${isVer ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-                    ${isVer ? 'Verified • Visible to Clients' : 'Disabled • Hidden from Clients'}
-                  </span>
-                </div>
-                <p class="text-xs text-slate-600">Licence: <span class="font-mono font-semibold">${esc(a.licenceNumber || 'Not provided')}</span> • ${esc(a.city || '')}, ${esc(a.state || '')} (${esc(a.pin || '')}) • ${a.yearsOfExperience || 0} yrs exp</p>
-                <p class="text-[11px] text-slate-500">${esc(a.email)} • ${esc(a.phone)}</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-2">
-              <button type="button" data-toggle-verify="${esc(a.id)}" class="px-4 py-2 rounded-xl text-xs font-bold ${isVer ? 'bg-rose-600 text-white hover:bg-rose-500' : 'bg-emerald-600 text-white hover:bg-emerald-500'}">
-                ${isVer ? 'Disable Visibility' : 'Enable & Verify'}
-              </button>
-            </div>
-          </div>`;
-      }).join('');
-    }
-
-    function renderPlanCards(role, containerId) {
-      const rules = db.subscriptionRules[role];
-      const box = document.getElementById(containerId);
-      box.innerHTML = rules.plans.map((p, idx) => `
-        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50 space-y-2" data-plan-role="${role}" data-plan-idx="${idx}">
-          <div class="flex items-center justify-between gap-2">
-            <input type="text" data-field="name" value="${esc(p.name)}" class="font-bold text-xs text-slate-900 bg-white px-2.5 py-1.5 rounded-lg border border-slate-300 flex-1" />
-            <label class="flex items-center gap-1 text-[11px] font-semibold text-slate-700">
-              <input type="checkbox" data-field="enabled" ${p.enabled !== false ? 'checked' : ''} /> Active
-            </label>
-            <button type="button" data-del-plan="${role}:${idx}" class="text-rose-600 text-xs font-bold px-2 hover:underline">Remove</button>
-          </div>
-          <div class="grid grid-cols-4 gap-2 text-xs">
-            <div>
-              <label class="block text-[10px] text-slate-500">Price (₹)</label>
-              <input type="number" min="0" data-field="priceInr" value="${Number(p.priceInr || 0)}" class="w-full px-2 py-1 rounded-lg border border-slate-300 bg-white font-bold" />
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-500">Contacts</label>
-              <input type="number" min="0" data-field="credits" value="${Number(p.credits || 0)}" class="w-full px-2 py-1 rounded-lg border border-slate-300 bg-white font-bold" />
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-500">Days (0=none)</label>
-              <input type="number" min="0" data-field="durationDays" value="${Number(p.durationDays || 0)}" class="w-full px-2 py-1 rounded-lg border border-slate-300 bg-white font-bold" />
-            </div>
-            <div>
-              <label class="block text-[10px] text-slate-500">Scope</label>
-              <select data-field="scope" class="w-full px-1.5 py-1 rounded-lg border border-slate-300 bg-white text-[11px]">
-                <option value="per_contact" ${p.scope === 'per_contact' ? 'selected' : ''}>Per Contact</option>
-                <option value="pack" ${p.scope === 'pack' ? 'selected' : ''}>Pack</option>
-                <option value="pool" ${p.scope === 'pool' ? 'selected' : ''}>Pool</option>
-                <option value="notified_unlimited" ${p.scope === 'notified_unlimited' ? 'selected' : ''}>Notified Unlim</option>
-                <option value="all_unlimited" ${p.scope === 'all_unlimited' ? 'selected' : ''}>All Unlimited</option>
-              </select>
-            </div>
-          </div>
-          <input type="text" data-field="description" value="${esc(p.description || '')}" placeholder="Plan description" class="w-full px-2.5 py-1 rounded-lg border border-slate-300 bg-white text-[11px] text-slate-600" />
-        </div>
-      `).join('');
-    }
-
-    function renderSubscriptionEditor() {
-      const r = db.subscriptionRules;
-      document.getElementById('cfg-upi-vpa').value = r.upiVpa || 'nyayasetu@okicici';
-      document.getElementById('cfg-upi-name').value = r.upiName || 'NyayaSetu Legal';
-      document.getElementById('cli-free-contacts').value = r.client.freeContacts;
-      document.getElementById('cli-push-after').value = r.client.pushAfterContacts;
-      document.getElementById('adv-free-contacts').value = r.advisor.freeContacts;
-      document.getElementById('adv-push-after').value = r.advisor.pushAfterContacts;
-      renderPlanCards('client', 'client-plans-editor');
-      renderPlanCards('advisor', 'advisor-plans-editor');
-    }
-
-    function collectPlansFromEditor(role, containerId) {
-      const cards = document.querySelectorAll(`#${containerId} [data-plan-role="${role}"]`);
-      const existing = db.subscriptionRules[role].plans;
-      return Array.from(cards).map((card, i) => ({
-        id: (existing[i] && existing[i].id) || `${role}_plan_${Date.now()}_${i}`,
-        name: card.querySelector('[data-field="name"]').value.trim(),
-        priceInr: Number(card.querySelector('[data-field="priceInr"]').value || 0),
-        credits: Number(card.querySelector('[data-field="credits"]').value || 0),
-        durationDays: Number(card.querySelector('[data-field="durationDays"]').value || 0),
-        scope: card.querySelector('[data-field="scope"]').value,
-        enabled: card.querySelector('[data-field="enabled"]').checked,
-        description: card.querySelector('[data-field="description"]').value.trim()
-      }));
-    }
-
-    function renderPaymentsTable() {
-      const box = document.getElementById('admin-payments-table');
-      const total = db.payments.filter(p => p.status === 'verified').reduce((s, p) => s + Number(p.amountInr || 0), 0);
-      document.getElementById('payments-total-pill').textContent = `₹${total} Verified`;
-      if (!db.payments.length) {
-        box.innerHTML = '<p class="text-xs text-slate-500 py-4 text-center">No UPI/GPay payment transactions recorded yet.</p>';
-        return;
-      }
-      box.innerHTML = `<table class="w-full text-left text-xs">
-        <thead><tr class="border-b border-slate-200 text-slate-500"><th class="py-2 pr-3">Txn ID</th><th class="py-2 pr-3">User</th><th class="py-2 pr-3">Plan</th><th class="py-2 pr-3">Amount</th><th class="py-2 pr-3">UTR / Ref</th><th class="py-2 pr-3">Status</th><th class="py-2">Action</th></tr></thead>
-        <tbody>${db.payments.slice().reverse().map(p => `
-          <tr class="border-b border-slate-100">
-            <td class="py-2 pr-3 font-mono font-semibold">${esc(p.id)}</td>
-            <td class="py-2 pr-3">${esc(p.userName || p.userId)} <span class="text-[10px] uppercase text-slate-400">(${esc(p.userRole)})</span></td>
-            <td class="py-2 pr-3">${esc(p.planName)}</td>
-            <td class="py-2 pr-3 font-bold">₹${Number(p.amountInr)}</td>
-            <td class="py-2 pr-3 font-mono">${esc(p.utrNumber || 'Pending')}</td>
-            <td class="py-2 pr-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${p.status === 'verified' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${esc(p.status)}</span></td>
-            <td class="py-2">${p.status !== 'verified' ? `<button type="button" data-verify-pay="${esc(p.id)}" class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold text-[11px]">Verify &amp; Credit</button>` : '—'}</td>
-          </tr>`).join('')}</tbody></table>`;
-    }
-
-    function loadSecurityForm() {
-      document.getElementById('sec-admin-id').value = db.adminSecurity.adminId;
-      document.getElementById('sec-admin-pass').value = db.adminSecurity.passcode;
-      document.getElementById('sec-admin-pin').value = db.adminSecurity.pin;
-    }
-
-    function unlockDashboard() {
-      document.getElementById('admin-login-box').classList.add('hidden');
-      document.getElementById('admin-dashboard').classList.remove('hidden');
-      document.getElementById('btn-admin-logout').classList.remove('hidden');
-      switchAdminTab('overview');
-      pullFromCloud().then(ok => {
-        if (ok) {
-          renderOverview();
-          renderAdvisorVerification();
-          renderSubscriptionEditor();
-          renderPaymentsTable();
-        }
-      });
-    }
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      loadDB();
-      await pullFromCloud();
-
-      if (sessionStorage.getItem(ADMIN_AUTH_KEY) === '1') {
-        unlockDashboard();
-      }
-
-      document.getElementById('form-admin-login').addEventListener('submit', e => {
-        e.preventDefault();
-        const u = document.getElementById('admin-user').value.trim().toLowerCase();
-        const p = document.getElementById('admin-pass').value;
-        const pin = document.getElementById('admin-pin').value.trim();
-        const sec = db.adminSecurity;
-        if (u === sec.adminId.toLowerCase() && p === sec.passcode && pin === sec.pin) {
-          sessionStorage.setItem(ADMIN_AUTH_KEY, '1');
-          unlockDashboard();
-          toast('Admin console unlocked');
-        } else {
-          toast('Invalid Admin ID, Passcode, or Security PIN');
-        }
-      });
-
-      document.getElementById('btn-admin-logout').addEventListener('click', () => {
-        sessionStorage.removeItem(ADMIN_AUTH_KEY);
-        document.getElementById('admin-dashboard').classList.add('hidden');
-        document.getElementById('admin-login-box').classList.remove('hidden');
-        document.getElementById('btn-admin-logout').classList.add('hidden');
-        toast('Admin console locked');
-      });
-
-      document.querySelectorAll('.admin-tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => switchAdminTab(btn.getAttribute('data-admin-tab')));
-      });
-
-      document.querySelectorAll('.db-tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => renderDbTable(btn.getAttribute('data-db-tab')));
-      });
-
-      document.getElementById('verify-filter').addEventListener('change', renderAdvisorVerification);
-
-      document.addEventListener('click', e => {
-        const verBtn = e.target.closest('[data-toggle-verify]');
-        if (verBtn) {
-          const id = verBtn.getAttribute('data-toggle-verify');
-          const adv = db.users.find(u => u.id === id);
-          if (adv) {
-            adv.advisorVerified = adv.advisorVerified === false ? true : false;
-            adv.verifiedAt = adv.advisorVerified ? Date.now() : null;
-            saveDB();
-            renderAdvisorVerification();
-            toast(adv.advisorVerified ? `${adv.name} verified & visible to clients` : `${adv.name} hidden from clients`);
-          }
-        }
-
-        const delBtn = e.target.closest('[data-del-plan]');
-        if (delBtn) {
-          const [role, idx] = delBtn.getAttribute('data-del-plan').split(':');
-          db.subscriptionRules[role].plans.splice(Number(idx), 1);
-          saveDB();
-          renderSubscriptionEditor();
-          toast('Plan removed');
-        }
-
-        const verifyPayBtn = e.target.closest('[data-verify-pay]');
-        if (verifyPayBtn) {
-          const pid = verifyPayBtn.getAttribute('data-verify-pay');
-          const pay = db.payments.find(x => x.id === pid);
-          if (pay) {
-            pay.status = 'verified';
-            pay.verifiedAt = Date.now();
-            const usr = db.users.find(u => u.id === pay.userId);
-            if (usr) {
-              usr.subscriptionPlan = pay.planId;
-              usr.subscriptionScope = pay.scope || 'pack';
-              usr.contactCreditsRemaining = pay.scope && pay.scope.includes('unlimited')
-                ? 999999
-                : (usr.contactCreditsRemaining || 0) + Number(pay.credits || 0);
-              if (pay.durationDays > 0) {
-                usr.subscriptionExpiresAt = Date.now() + pay.durationDays * 24 * 3600 * 1000;
-              }
-            }
-            saveDB();
-            renderPaymentsTable();
-            toast('Payment verified & user account credited!');
-          }
-        }
-      });
-
-      document.getElementById('btn-save-upi-cfg').addEventListener('click', () => {
-        db.subscriptionRules.upiVpa = document.getElementById('cfg-upi-vpa').value.trim();
-        db.subscriptionRules.upiName = document.getElementById('cfg-upi-name').value.trim();
-        saveDB();
-        toast('UPI / GPay merchant settings saved');
-      });
-
-      document.getElementById('btn-add-client-plan').addEventListener('click', () => {
-        db.subscriptionRules.client.plans.push({
-          id: `cli_custom_${Date.now()}`,
-          name: 'New Client Plan',
-          priceInr: 49,
-          credits: 10,
-          durationDays: 0,
-          scope: 'pack',
-          enabled: true,
-          description: 'Custom client contact pack'
-        });
-        renderSubscriptionEditor();
-      });
-
-      document.getElementById('btn-add-advisor-plan').addEventListener('click', () => {
-        db.subscriptionRules.advisor.plans.push({
-          id: `adv_custom_${Date.now()}`,
-          name: 'New Advisor Plan',
-          priceInr: 99,
-          credits: 25,
-          durationDays: 30,
-          scope: 'pool',
-          enabled: true,
-          description: 'Custom advisor pool pack'
-        });
-        renderSubscriptionEditor();
-      });
-
-      document.getElementById('btn-save-client-rules').addEventListener('click', () => {
-        db.subscriptionRules.client.freeContacts = Number(document.getElementById('cli-free-contacts').value || 0);
-        db.subscriptionRules.client.pushAfterContacts = Number(document.getElementById('cli-push-after').value || 0);
-        db.subscriptionRules.client.plans = collectPlansFromEditor('client', 'client-plans-editor');
-        saveDB();
-        toast('Client subscription rules updated!');
-      });
-
-      document.getElementById('btn-save-advisor-rules').addEventListener('click', () => {
-        db.subscriptionRules.advisor.freeContacts = Number(document.getElementById('adv-free-contacts').value || 0);
-        db.subscriptionRules.advisor.pushAfterContacts = Number(document.getElementById('adv-push-after').value || 0);
-        db.subscriptionRules.advisor.plans = collectPlansFromEditor('advisor', 'advisor-plans-editor');
-        saveDB();
-        toast('Advisor subscription rules updated!');
-      });
-
-      document.getElementById('btn-sync-now').addEventListener('click', async () => {
-        const pulled = await pullFromCloud();
-        if (pulled) {
-          renderOverview();
-          renderAdvisorVerification();
-          renderSubscriptionEditor();
-          renderPaymentsTable();
-          if (window.fetchUtrLedger) window.fetchUtrLedger();
-          toast('Synced latest Cloud DB');
-        } else {
-          await syncToCloud();
-          toast('Pushed local DB to Cloud');
-        }
-      });
-
-      document.getElementById('btn-export-db').addEventListener('click', () => {
-        const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `nyayasetu_db_${new Date().toISOString().slice(0, 10)}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-      });
-
-      document.getElementById('btn-cloud-connect').addEventListener('click', async () => {
-        const provider = document.getElementById('cloud-provider').value;
-        const url = document.getElementById('cloud-url').value.trim();
-        const key = document.getElementById('cloud-key').value.trim();
-        if (!url.startsWith('https://')) return toast('Enter a valid HTTPS URL');
-        cloudCfg = { provider, url, key };
-        localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(cloudCfg));
-        updateCloudStatusUI();
-        const pulled = await pullFromCloud();
-        if (!pulled) await syncToCloud();
-        renderOverview();
-        toast('Cloud DB connected & synced!');
-      });
-
-      document.getElementById('btn-cloud-disconnect').addEventListener('click', () => {
-        cloudCfg = { provider: 'supabase', url: '', key: '' };
-        localStorage.removeItem(CLOUD_CFG_KEY);
-        updateCloudStatusUI();
-        toast('Disconnected Cloud DB');
-      });
-
-      document.getElementById('btn-reset-db').addEventListener('click', () => {
-        localStorage.removeItem(DB_KEY);
-        loadDB();
-        renderOverview();
-        toast('Local DB reset');
-      });
-
-      document.getElementById('form-admin-security').addEventListener('submit', e => {
-        e.preventDefault();
-        db.adminSecurity = {
-          adminId: document.getElementById('sec-admin-id').value.trim(),
-          passcode: document.getElementById('sec-admin-pass').value,
-          pin: document.getElementById('sec-admin-pin').value.trim()
-        };
-        saveDB();
-        toast('Admin security credentials updated!');
-      });
     });
-  </script>
 
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => {
+      const t = btn.getAttribute('data-tab');
+      ['overview', 'inspector', 'payments', 'rules', 'security'].forEach(k => document.getElementById('tab-' + k).classList.toggle('hidden', k !== t));
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        const active = b.getAttribute('data-tab') === t;
+        b.className = active ? 'tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-black text-white' : 'tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700';
+      });
+    }));
 
-  <script>
-    (function () {
-      async function syncRoleToApi(role) {
-        setTimeout(async () => {
-          try {
-            const rule = typeof db !== 'undefined' && db.subscriptionRules && db.subscriptionRules[role];
-            if (!rule) return;
-            const res = await fetch('/api/save-rules', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                role,
-                freeContacts: rule.freeContacts,
-                pushAfterContacts: rule.pushAfterContacts,
-                plans: rule.plans
-              })
-            });
-            const data = await res.json();
-            if (res.ok && typeof toast === 'function') toast('Live app rules synced (' + role + ')!');
-            else if (!res.ok && typeof toast === 'function') toast('Sync error: ' + (data.error || 'failed'));
-          } catch (e) {}
-        }, 150);
+    document.getElementById('form-add-user').addEventListener('submit', async e => {
+      e.preventDefault();
+      const role = document.getElementById('add-role').value;
+      const u = {
+        id: 'u_' + Date.now(), role,
+        name: document.getElementById('add-name').value.trim(),
+        email: document.getElementById('add-email').value.trim().toLowerCase(),
+        phone: document.getElementById('add-phone').value.trim(),
+        password: document.getElementById('add-pass').value.trim(),
+        city: document.getElementById('add-city').value.trim(),
+        state: document.getElementById('add-state').value.trim(),
+        pin: document.getElementById('add-pin').value.trim(),
+        licenceNumber: document.getElementById('add-licence').value.trim(),
+        yearsOfExperience: Number(document.getElementById('add-exp').value || 0),
+        specialisations: document.getElementById('add-spec').value.split(',').map(s => s.trim()).filter(Boolean),
+        advisorVerified: true, contactCreditsRemaining: 0, unlockedContactIds: [],
+        createdAt: new Date().toISOString()
+      };
+      db.users.push(u);
+      await saveCloud('User added to Supabase.');
+      e.target.reset();
+    });
+
+    document.addEventListener('click', async e => {
+      const du = e.target.closest('[data-del-user]');
+      if (du) {
+        const id = du.getAttribute('data-del-user');
+        db.users = (db.users || []).filter(u => u.id !== id);
+        await saveCloud('User deleted from Supabase.');
       }
-      document.getElementById('btn-save-client-rules')?.addEventListener('click', () => syncRoleToApi('client'));
-      document.getElementById('btn-save-advisor-rules')?.addEventListener('click', () => syncRoleToApi('advisor'));
-    })();
-  </script>
-
-
-  <script>
-    (function () {
-      let cachedPayments = [];
-
-      async function fetchUtrLedger() {
-        const box = document.getElementById('utr-ledger-list');
-        if (!box) return;
-        try {
-          const res = await fetch('/api/admin-verify-payment?_t=' + Date.now(), { cache: 'no-store' });
-          const data = await res.json();
-          cachedPayments = data.payments || [];
-          renderUtrLedger();
-        } catch (e) {
-          box.innerHTML = '<p class="text-rose-600">Could not load UPI ledger.</p>';
-        }
+      const dc = e.target.closest('[data-del-case]');
+      if (dc) {
+        const id = dc.getAttribute('data-del-case');
+        db.cases = (db.cases || []).filter(c => c.id !== id);
+        await saveCloud('Case deleted from Supabase.');
       }
-      window.fetchUtrLedger = fetchUtrLedger;
-
-      function syncLocalSubscription(payment, isVerified) {
-        if (typeof db === 'undefined' || !db) return;
-        if (Array.isArray(db.payments)) {
-          const lp = db.payments.find(x => x.id === payment.id || (payment.utr_number && x.utr === payment.utr_number));
-          if (lp) lp.status = isVerified ? 'verified' : 'failed';
-        }
-        if (isVerified && Array.isArray(db.users)) {
-          const u = db.users.find(x => x.id === payment.user_id);
-          const role = payment.user_role || (u && u.role) || 'client';
-          const plans = (db.subscriptionRules && db.subscriptionRules[role] && db.subscriptionRules[role].plans) || [];
-          const plan = plans.find(p => p.id === payment.plan_id) || {};
-          if (u) {
-            const credits = Number(plan.credits || 0);
-            const days = Number(plan.durationDays || 0);
-            const scope = plan.scope || 'pack';
-            u.subscriptionPlan = payment.plan_id;
-            u.subscriptionScope = scope;
-            u.contactCreditsRemaining = scope.includes('unlimited')
-              ? 999999
-              : (Number(u.contactCreditsRemaining) || 0) + credits;
-            u.subscriptionExpiresAt = days > 0 ? new Date(Date.now() + days * 86400000).toISOString() : null;
+      const vp = e.target.closest('[data-verify-pay]');
+      if (vp) {
+        const pid = vp.getAttribute('data-verify-pay');
+        const p = (db.payments || []).find(x => x.id === pid);
+        if (!p) return;
+        p.status = 'verified';
+        p.verifiedAt = new Date().toISOString();
+        const u = (db.users || []).find(x => x.id === p.userId);
+        if (u) {
+          u.contactCreditsRemaining = Number(u.contactCreditsRemaining || 0) + Number(p.credits || 1);
+          u.subscriptionPlanName = p.planName || 'Pro Plan';
+          if (Number(p.durationDays || 0) > 0) {
+            u.subscriptionExpiresAt = new Date(Date.now() + Number(p.durationDays) * 86400000).toISOString();
           }
         }
-        if (typeof saveDB === 'function') saveDB();
+        await saveCloud('Payment verified & user credited!');
       }
+    });
 
-      function renderUtrLedger() {
-        const box = document.getElementById('utr-ledger-list');
-        if (!box) return;
-        const q = ((document.getElementById('utr-search') || {}).value || '').toLowerCase();
-        const rows = cachedPayments.filter(p =>
-          !q ||
-          (p.id || '').toLowerCase().includes(q) ||
-          (p.utr_number || '').toLowerCase().includes(q) ||
-          (p.user_id || '').toLowerCase().includes(q)
-        );
-        if (!rows.length) {
-          box.innerHTML = '<p class="text-slate-400 py-3">No matching UPI transactions found.</p>';
-          return;
-        }
-        box.innerHTML = `<table class="w-full text-left border-collapse">
-          <thead><tr class="border-b border-slate-200 text-slate-500">
-            <th class="py-2 pr-3">Txn ID</th>
-            <th class="py-2 pr-3">User / Role</th>
-            <th class="py-2 pr-3">Plan</th>
-            <th class="py-2 pr-3">Amount</th>
-            <th class="py-2 pr-3">UTR Ref</th>
-            <th class="py-2 pr-3">Status</th>
-            <th class="py-2">UTR Verification Toggle</th>
-          </tr></thead>
-          <tbody>${rows.map(p => {
-            const isVerified = p.status === 'verified';
-            return `<tr class="border-b border-slate-100">
-              <td class="py-2.5 pr-3 font-mono">${p.id}</td>
-              <td class="py-2.5 pr-3">${p.user_id} <span class="text-slate-400">(${p.user_role})</span></td>
-              <td class="py-2.5 pr-3 font-semibold">${p.plan_name || p.plan_id}</td>
-              <td class="py-2.5 pr-3 font-bold">₹${p.amount_inr}</td>
-              <td class="py-2.5 pr-3 font-mono">${p.utr_number || '—'}</td>
-              <td class="py-2.5 pr-3">
-                <span class="px-2 py-0.5 rounded-full font-bold ${isVerified ? 'bg-emerald-100 text-emerald-800' : p.status === 'failed' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'}">
-                  ${isVerified ? 'verified (active)' : p.status}
-                </span>
-              </td>
-              <td class="py-2.5">
-                <label class="inline-flex items-center gap-2 cursor-pointer select-none">
-                  <input type="checkbox" data-utr-toggle="${p.id}" class="sr-only peer" ${isVerified ? 'checked' : ''} />
-                  <div class="relative w-11 h-6 bg-slate-200 rounded-full peer peer-checked:bg-emerald-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
-                  <span class="text-xs font-bold ${isVerified ? 'text-emerald-700' : 'text-slate-600'}">${isVerified ? 'Confirmed' : 'Pending'}</span>
-                </label>
-              </td>
-            </tr>`;
-          }).join('')}</tbody></table>`;
+    document.getElementById('form-rules').addEventListener('submit', async e => {
+      e.preventDefault();
+      if (!db.subscriptionRules) db.subscriptionRules = defaultRules();
+      const vpa = document.getElementById('rule-upi-vpa').value.trim();
+      const name = document.getElementById('rule-upi-name').value.trim();
+      db.upiVpa = vpa; db.upiName = name;
+      db.subscriptionRules.upiVpa = vpa; db.subscriptionRules.upiName = name;
+      document.querySelectorAll('[data-plan-role]').forEach(inp => {
+        const role = inp.getAttribute('data-plan-role');
+        const idx = Number(inp.getAttribute('data-plan-idx'));
+        const field = inp.getAttribute('data-plan-field');
+        const pl = db.subscriptionRules[role][idx];
+        if (pl) pl[field] = (field === 'priceInr' || field === 'credits') ? Number(inp.value) : inp.value.trim();
+      });
+      await fetch('/api/save-rules', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ upiVpa: vpa, upiName: name, subscriptionRules: db.subscriptionRules })
+      }).catch(() => {});
+      await saveCloud('Subscription rules & Merchant UPI published live!');
+    });
 
-        box.querySelectorAll('[data-utr-toggle]').forEach(toggle => {
-          toggle.addEventListener('change', async () => {
-            const txnId = toggle.dataset.utrToggle;
-            const action = toggle.checked ? 'approve' : 'reject';
-            toggle.disabled = true;
-            try {
-              const res = await fetch('/api/admin-verify-payment', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ txnId, action })
-              });
-              const data = await res.json();
-              if (!res.ok || !data.ok) throw new Error(data.error || 'Verification failed');
-              const payment = cachedPayments.find(p => p.id === txnId);
-              if (payment) syncLocalSubscription(payment, action === 'approve');
-              if (typeof toast === 'function') {
-                toast(action === 'approve'
-                  ? 'UTR confirmed — subscription enabled!'
-                  : 'UTR marked rejected');
-              }
-            } catch (err) {
-              alert(err.message || 'Could not update UTR verification');
-            } finally {
-              fetchUtrLedger();
-            }
-          });
-        });
+    document.getElementById('form-security').addEventListener('submit', async e => {
+      e.preventDefault();
+      db.adminSecurity = {
+        adminId: document.getElementById('sec-id').value.trim(),
+        passcode: document.getElementById('sec-pass').value.trim(),
+        pin: document.getElementById('sec-pin').value.trim()
+      };
+      await saveCloud('Admin security credentials saved!');
+    });
+
+    document.getElementById('btn-refresh').addEventListener('click', async () => { await loadCloud(); renderAll(); toast('Synced from Supabase.'); });
+    document.getElementById('btn-logout').addEventListener('click', () => { sessionStorage.removeItem('nyaya_admin_ok'); location.reload(); });
+
+    (async () => {
+      if (sessionStorage.getItem('nyaya_admin_ok') === '1') {
+        await loadCloud();
+        document.getElementById('admin-login-view').classList.add('hidden');
+        document.getElementById('admin-dash-view').classList.remove('hidden');
+        document.getElementById('btn-refresh').classList.remove('hidden');
+        document.getElementById('btn-logout').classList.remove('hidden');
+        renderAll();
       }
-
-      document.getElementById('btn-refresh-utr')?.addEventListener('click', fetchUtrLedger);
-      document.getElementById('utr-search')?.addEventListener('input', renderUtrLedger);
     })();
   </script>
-
 </body>
 </html>
