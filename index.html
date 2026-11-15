@@ -1245,7 +1245,19 @@
     }
 
     async function syncToCloud() {
-      return; // Handled via dedicated /api/register-sync, /api/create-payment, /api/submit-utr endpoints
+      try {
+        await fetch('/api/sync-mutation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            users: db.users || [],
+            cases: db.cases || [],
+            messages: db.messages || [],
+            notifications: db.notifications || []
+          })
+        });
+      } catch (e) {}
+      return;
       if (!cloudCfg || !cloudCfg.url || !cloudCfg.url.startsWith('https://')) return;
       const base = cloudCfg.url.replace(/\/+$/, '');
       try {
@@ -1714,6 +1726,10 @@
       advisors.sort((a, b) => (Number(b.yearsOfExperience) || 0) - (Number(a.yearsOfExperience) || 0));
 
       const tbody = document.getElementById('cw-advisors-tbody');
+      if (advisors.length === 0 && scope !== 'all' && !specKw) {
+        advisors = db.users.filter(u => u.role === 'advisor');
+        advisors.sort((a, b) => (Number(b.yearsOfExperience) || 0) - (Number(a.yearsOfExperience) || 0));
+      }
       if (advisors.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">No advisors match this scope/filter yet.</td></tr>';
         return;
@@ -2013,18 +2029,24 @@
     }
 
     function updateAdvisorKPIs() {
-      const a = db.users.find(u => u.id === session.userId);
-      const reqs = db.notifications.filter(n => n.advisorId === session.userId);
-      const unlockedCount = getAdvisorUnlockedCaseIds(session.userId).length;
-      const freeLeft = Math.max(0, 3 - unlockedCount);
-      document.getElementById('adv-stat-reqs').textContent = reqs.length;
-      document.getElementById('adv-stat-free').textContent = `${freeLeft} / 3`;
-      if (a) {
-        const checks = [a.name, a.licenceNumber, a.college, a.university, a.passingYear, a.yearsOfExperience > 0, a.bio, (a.specialisations || []).length > 0];
-        const pct = Math.round((checks.filter(Boolean).length / checks.length) * 100);
-        document.getElementById('adv-comp-pct').textContent = pct + '%';
-        document.getElementById('adv-comp-bar').style.width = pct + '%';
-      }
+      try {
+        const a = (db.users || []).find(u => u.id === session.userId);
+        const reqs = (db.notifications || []).filter(n => n.advisorId === session.userId);
+        const unlockedCount = getAdvisorUnlockedCaseIds(session.userId).length;
+        const freeLeft = Math.max(0, 3 - unlockedCount);
+        const reqEl = document.getElementById('adv-stat-reqs');
+        const freeEl = document.getElementById('adv-stat-free');
+        if (reqEl) reqEl.textContent = reqs.length;
+        if (freeEl) freeEl.textContent = `${freeLeft} / 3`;
+        if (a) {
+          const checks = [a.name, a.licenceNumber, a.college, a.university, a.passingYear, Number(a.yearsOfExperience) > 0, a.bio, (a.specialisations || []).length > 0];
+          const pct = Math.round((checks.filter(Boolean).length / checks.length) * 100);
+          const pctEl = document.getElementById('adv-comp-pct');
+          const barEl = document.getElementById('adv-comp-bar');
+          if (pctEl) pctEl.textContent = pct + '%';
+          if (barEl) barEl.style.width = pct + '%';
+        }
+      } catch (e) { console.error('updateAdvisorKPIs error:', e); }
     }
 
     function updateLiveCasePreview() {
