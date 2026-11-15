@@ -46,6 +46,7 @@ module.exports = async function handler(req, res) {
         { id: 'cli_28d_5', name: '28-Day 5 Contacts Plan', priceInr: 49, credits: 5, durationDays: 28, enabled: true, description: '₹49 for 28 days • 5 advisor contacts' },
         { id: 'cli_28d_10', name: '28-Day 10 Contacts Plan', priceInr: 99, credits: 10, durationDays: 28, enabled: true, description: '₹99 for 28 days • 10 advisor contacts' }
       ],
+      firm: [{id:'firm_1m_20',name:'Firm Starter (20)',priceInr:999,credits:20,durationDays:30,enabled:true,description:'₹999/mo • 20 unlocks'},{id:'firm_3m_75',name:'Firm Growth (75)',priceInr:2499,credits:75,durationDays:90,enabled:true,description:'₹2,499/3mo • 75 unlocks'},{id:'firm_1y_400',name:'Firm Enterprise (400)',priceInr:7999,credits:400,durationDays:365,enabled:true,description:'₹7,999/yr • 400 unlocks'}],
       advisor: [
         { id: 'adv_1m_5', name: '1-Month Starter (5 Contacts)', priceInr: 199, credits: 5, durationDays: 30, enabled: true, description: '₹199/mo • 5 client contact unlocks' },
         { id: 'adv_1m_25', name: '1-Month Growth (25 Contacts)', priceInr: 499, credits: 25, durationDays: 30, enabled: true, description: '₹499/mo • 25 client contact unlocks' },

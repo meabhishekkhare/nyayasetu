@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen">
-  <header class="bg-black text-white border-b border-zinc-800 sticky top-0 z-30">
+  <header class="bg-[#08306B] text-white border-b border-[#08519C] sticky top-0 z-30">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <div class="w-9 h-9 rounded-xl bg-white text-black font-black flex items-center justify-center text-sm">NS</div>
@@ -47,6 +47,7 @@
       <button type="button" data-tab="overview" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-black text-white">Overview</button>
       <button type="button" data-tab="inspector" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700">Relational Data Inspector</button>
       <button type="button" data-tab="payments" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700">UTR Verification <span id="badge-pending" class="ml-1 px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px]">0</span></button>
+      <button type="button" data-tab="handshake" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700">Handshake &amp; Mapping</button>
       <button type="button" data-tab="rules" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700">Subscription Rules &amp; UPI</button>
       <button type="button" data-tab="security" class="tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700">Admin Security</button>
     </div>
@@ -104,7 +105,9 @@
       </table>
     </section>
 
-    <section id="tab-rules" class="hidden bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
+    <section id="tab-handshake" class="hidden bg-white rounded-2xl border border-slate-200 p-5 space-y-3 overflow-x-auto"><div class="flex items-center justify-between"><h3 class="text-sm font-bold text-[#08306B]">Client-Advisor Handshake &amp; Closed Lifecycle</h3><span id="hs-closed-count" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-[#DEEBF7] text-[#08519C]">0 Closed</span></div><table class="w-full text-left text-xs border-collapse"><thead><tr class="border-b border-slate-200 text-slate-500"><th class="py-2 pr-3">Case ID</th><th class="py-2 pr-3">Client</th><th class="py-2 pr-3">Advisor/Firm</th><th class="py-2 pr-3">Status</th><th class="py-2">Action</th></tr></thead><tbody id="tbody-handshake" class="divide-y divide-slate-100"></tbody></table></section>
+
+<section id="tab-rules" class="hidden bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
       <h3 class="text-sm font-bold">Live Merchant UPI &amp; Subscription Plans</h3>
       <form id="form-rules" class="space-y-4 text-xs">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -140,6 +143,7 @@
           { id: 'cli_28d_5', name: '28-Day 5 Contacts Plan', priceInr: 49, credits: 5, durationDays: 28, enabled: true, description: '₹49 for 28 days • 5 advisor contacts' },
           { id: 'cli_28d_10', name: '28-Day 10 Contacts Plan', priceInr: 99, credits: 10, durationDays: 28, enabled: true, description: '₹99 for 28 days • 10 advisor contacts' }
         ],
+        firm: [{id:'firm_1m_20',name:'Firm Starter (20)',priceInr:999,credits:20,durationDays:30,enabled:true},{id:'firm_3m_75',name:'Firm Growth (75)',priceInr:2499,credits:75,durationDays:90,enabled:true},{id:'firm_1y_400',name:'Firm Enterprise (400)',priceInr:7999,credits:400,durationDays:365,enabled:true}],
         advisor: [
           { id: 'adv_1m_5', name: '1-Month Starter (5 Contacts)', priceInr: 199, credits: 5, durationDays: 30, enabled: true, description: '₹199/mo • 5 client unlocks' },
           { id: 'adv_1m_25', name: '1-Month Growth (25 Contacts)', priceInr: 499, credits: 25, durationDays: 30, enabled: true, description: '₹499/mo • 25 client unlocks' },
@@ -165,7 +169,8 @@
           upiVpa: curR.upiVpa || db.upiVpa || defR.upiVpa,
           upiName: curR.upiName || db.upiName || defR.upiName,
           client: Array.isArray(curR.client) && curR.client.length ? curR.client : defR.client,
-          advisor: Array.isArray(curR.advisor) && curR.advisor.length ? curR.advisor : defR.advisor
+          advisor: Array.isArray(curR.advisor) && curR.advisor.length ? curR.advisor : defR.advisor,
+          firm: Array.isArray(curR.firm) && curR.firm.length ? curR.firm : defR.firm
         };
         if (!db.adminSecurity) db.adminSecurity = { adminId: 'admin@nyayasetu.in', passcode: 'admin123', pin: '2026' };
       }
@@ -225,10 +230,11 @@
           <td class="py-2">${p.status !== 'verified' ? `<button type="button" data-verify-pay="${esc(p.id)}" class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold hover:bg-emerald-500">Verify &amp; Credit</button>` : 'Verified'}</td>
         </tr>`).join('') || '<tr><td colspan="7" class="py-4 text-center text-slate-400">No payments yet.</td></tr>';
 
+      const hsCases=cases.filter(c=>c.handshakeStatus==='client_confirmed'||c.lockedAdvisorId||c.lifecycleStatus==='closed');document.getElementById('hs-closed-count').textContent=cases.filter(c=>c.lifecycleStatus==='closed').length+' Closed Lifecycles';document.getElementById('tbody-handshake').innerHTML=hsCases.map(c=>{const cli=users.find(u=>u.id===c.clientId),adv=users.find(u=>u.id===(c.mappedAdvisorId||c.lockedAdvisorId));return '<tr><td class="py-2 pr-3 font-mono font-bold">'+esc(c.caseNumber)+'</td><td class="py-2 pr-3">'+esc(cli?cli.name:c.clientId)+'</td><td class="py-2 pr-3">'+esc(adv?adv.name:'—')+'</td><td class="py-2 pr-3">'+esc(c.lifecycleStatus==='closed'?'Closed':'Pending')+'</td><td class="py-2">'+(c.lifecycleStatus!=='closed'?'<button type="button" data-close-hs="'+esc(c.id)+'" class="px-2.5 py-1 rounded-lg bg-[#08519C] text-white font-bold">Map & Close</button>':'Mapped')+'</td></tr>';}).join('')||'<tr><td colspan="5" class="py-4 text-center text-slate-400">No handshakes yet.</td></tr>';
       const r = db.subscriptionRules || defaultRules();
       document.getElementById('rule-upi-vpa').value = db.upiVpa || r.upiVpa || 'nyayasetu@upi';
       document.getElementById('rule-upi-name').value = db.upiName || r.upiName || 'NyayaSetu Legal Directory';
-      document.getElementById('plans-editor').innerHTML = ['client', 'advisor'].map(role => `
+      document.getElementById('plans-editor').innerHTML = ['client', 'advisor', 'firm'].map(role => `
         <div class="border border-slate-200 rounded-xl p-3 space-y-2">
           <h4 class="font-bold uppercase text-[11px] text-slate-500">${role} Plans</h4>
           <div class="grid grid-cols-6 gap-1.5 text-[10px] font-bold text-slate-400 px-2">
@@ -272,7 +278,7 @@
 
     document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => {
       const t = btn.getAttribute('data-tab');
-      ['overview', 'inspector', 'payments', 'rules', 'security'].forEach(k => document.getElementById('tab-' + k).classList.toggle('hidden', k !== t));
+      ['overview', 'inspector', 'payments', 'handshake', 'rules', 'security'].forEach(k => document.getElementById('tab-' + k).classList.toggle('hidden', k !== t));
       document.querySelectorAll('.tab-btn').forEach(b => {
         const active = b.getAttribute('data-tab') === t;
         b.className = active ? 'tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-black text-white' : 'tab-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white border border-slate-300 text-slate-700';
@@ -303,6 +309,7 @@
     });
 
     document.addEventListener('click', async e => {
+      const chs=e.target.closest('[data-close-hs]');if(chs){const c=(db.cases||[]).find(x=>x.id===chs.getAttribute('data-close-hs'));if(c){c.lifecycleStatus='closed';c.closedAt=new Date().toISOString();await saveCloud('Lifecycle closed!');}}
       const du = e.target.closest('[data-del-user]');
       if (du) {
         const id = du.getAttribute('data-del-user');
