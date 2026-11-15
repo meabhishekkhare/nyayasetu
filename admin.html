@@ -376,6 +376,13 @@
     }
 
     async function syncToCloud() {
+      try {
+        await fetch('/api/admin-db', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ payload: db })
+        });
+      } catch (_) {}
       if (!cloudCfg || !cloudCfg.url || !cloudCfg.url.startsWith('https://')) return;
       const base = cloudCfg.url.replace(/\/+$/, '');
       try {
@@ -404,6 +411,23 @@
     }
 
     async function pullFromCloud() {
+      try {
+        const apiRes = await fetch('/api/admin-db');
+        if (apiRes.ok) {
+          const apiData = await apiRes.json();
+          if (apiData && apiData.ok && apiData.payload && Array.isArray(apiData.payload.users)) {
+            db = apiData.payload;
+            ensureDbShape();
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+            const pill = document.getElementById('cloud-status-pill');
+            if (pill) {
+              pill.textContent = 'Live Cloud (Supabase)';
+              pill.className = 'px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-900/60 text-emerald-200 border border-emerald-700';
+            }
+            return true;
+          }
+        }
+      } catch (_) {}
       if (!cloudCfg || !cloudCfg.url || !cloudCfg.url.startsWith('https://')) return false;
       const base = cloudCfg.url.replace(/\/+$/, '');
       try {

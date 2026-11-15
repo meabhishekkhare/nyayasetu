@@ -1,5 +1,5 @@
 // Vercel Serverless Function: POST /api/register-sync
-// Persists newly registered users to Supabase nyayasetu_store so they can log in from any device.
+// Persists newly registered users (client or advisor) to both nyayasetu_store and nyayasetu_users.
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -27,6 +27,7 @@ module.exports = async function handler(req, res) {
   };
 
   try {
+    // 1. Upsert into nyayasetu_store (main payload.users)
     const r = await fetch(`${base}/rest/v1/nyayasetu_store?id=eq.main&select=payload`, { headers });
     const rows = r.ok ? await r.json() : [];
     const payload = (rows[0] && rows[0].payload) || { users: [], cases: [], messages: [], payments: [] };
@@ -41,6 +42,23 @@ module.exports = async function handler(req, res) {
       headers: { ...headers, Prefer: 'resolution=merge-duplicates' },
       body: JSON.stringify({ id: 'main', payload, updated_at: new Date().toISOString() })
     });
+
+    // 2. Also upsert into nyayasetu_users table for structured querying
+    await fetch(`${base}/rest/v1/nyayasetu_users`, {
+      method: 'POST',
+      headers: { ...headers, Prefer: 'resolution=merge-duplicates' },
+      body: JSON.stringify({
+        id: user.id,
+        role: user.role,
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        password: user.password || '',
+        subscription_plan: user.subscriptionPlan || 'free_starter',
+        subscription_scope: user.subscriptionScope || '',
+        contact_credits_remaining: user.contactCreditsRemaining || 0
+      })
+    }).catch(() => {});
 
     return res.status(200).json({ ok: true });
   } catch (err) {
