@@ -24,14 +24,14 @@
         <div>
           <div class="flex items-center gap-2">
             <span class="font-bold text-base">NyayaSetu</span>
-            <span id="hdr-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#08306B] text-[#DEEBF7]">Not Signed In</span>
+            <span id="hdr-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#08306B] text-[#DEEBF7]" data-i18n="notSignedIn">Not Signed In</span>
           </div>
           <p class="text-[11px] text-zinc-400">Verified Legal Case Intake, Advisor Directory &amp; Case Mail</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
         <select id="lang-select" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#2171B5] text-white border border-[#6BAED6] focus:outline-none"><option value="en">English</option><option value="hi">हिन्दी (Hindi)</option><option value="mr">मराठी (Marathi)</option><option value="bn">বাংলা (Bengali)</option><option value="ta">தமிழ் (Tamil)</option><option value="te">తెలుగు (Telugu)</option><option value="gu">ગુજરાતી (Gujarati)</option><option value="kn">ಕನ್ನಡ (Kannada)</option><option value="ml">മലയാളം (Malayalam)</option><option value="pa">ਪੰਜਾਬੀ (Punjabi)</option><option value="or">ଓଡ଼ିଆ (Odia)</option><option value="as">অসমীয়া (Assamese)</option><option value="ur">اردو (Urdu)</option></select>
-        <button id="btn-logout" type="button" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600 hover:bg-rose-500">Logout</button>
+        <button id="btn-logout" type="button" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600 hover:bg-rose-500" data-i18n="logout">Logout</button>
       </div>
     </div>
   </header>
@@ -45,7 +45,7 @@
         <div class="mx-auto w-14 h-14 rounded-2xl bg-[#F7FBFF] border border-[#C6DBEF] flex items-center justify-center shadow-sm">
           <svg class="w-8 h-8 text-[#08519C] scale-motion" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 21h14M4 7h16M6 7l-3 7h6l-3-7zM18 7l-3 7h6l-3-7z"/></svg>
         </div>
-        <span class="inline-block px-3 py-1 rounded-full bg-[#DEEBF7] text-[#08519C] text-[10px] font-bold tracking-wider uppercase">NyayaSetu • Verified Legal Network</span>
+        <span class="inline-block px-3 py-1 rounded-full bg-[#DEEBF7] text-[#08519C] text-[10px] font-bold tracking-wider uppercase" data-i18n="badgeNet">NyayaSetu • Verified Legal Network</span>
         <h2 id="auth-who-title" class="text-2xl font-extrabold text-[#08306B]">Who are you?</h2>
         <p id="auth-who-sub" class="text-xs text-[#2171B5] leading-relaxed">Choose Requestee to file a case &amp; find advisors, or Legal Advisor to manage your verified practice.</p>
       </div>
@@ -55,33 +55,33 @@
           <div class="mx-auto w-10 h-10 rounded-full bg-[#2171B5] text-white flex items-center justify-center">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </div>
-          <div class="text-sm font-bold text-[#08306B]">Requestee</div>
-          <div class="text-[11px] text-[#2171B5]">File a case &amp; find advisors</div>
+          <div class="text-sm font-bold text-[#08306B]" data-i18n="reqTitle">Requestee</div>
+          <div class="text-[11px] text-[#2171B5]" data-i18n="reqSub">File a case &amp; find advisors</div>
         </button>
         <button type="button" id="role-tab-advisor" onclick="setAuthRole('advisor')" class="p-4 rounded-2xl border border-[#C6DBEF] bg-white text-center space-y-2 transition">
           <div class="mx-auto w-10 h-10 rounded-full bg-[#08306B] text-white flex items-center justify-center">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 21h14M4 7h16M6 7l-3 7h6l-3-7zM18 7l-3 7h6l-3-7z"/></svg>
           </div>
-          <div class="text-sm font-bold text-[#08306B]">Legal Advisor</div>
-          <div class="text-[11px] text-[#2171B5]">Manage practice &amp; cases</div>
+          <div class="text-sm font-bold text-[#08306B]" data-i18n="advTitle">Legal Advisor</div>
+          <div class="text-[11px] text-[#2171B5]" data-i18n="advSub">Manage practice &amp; cases</div>
         </button>
       </div>
 
       <form id="form-login" class="space-y-3 text-sm">
         <div>
-          <label class="block text-xs font-bold text-[#08306B] mb-1">Email or Phone *</label>
+          <label class="block text-xs font-bold text-[#08306B] mb-1" data-i18n="emailLbl">Email or Phone *</label>
           <input id="login-email" type="text" required placeholder="Email or 10-digit phone" class="w-full px-3.5 py-2.5 rounded-xl border border-[#C6DBEF] bg-[#DEEBF7]/40 focus:outline-none focus:border-[#08519C]" />
         </div>
         <div>
-          <label class="block text-xs font-bold text-[#08306B] mb-1">Password *</label>
+          <label class="block text-xs font-bold text-[#08306B] mb-1" data-i18n="passLbl">Password *</label>
           <input id="login-pass" type="password" required placeholder="Password" class="w-full px-3.5 py-2.5 rounded-xl border border-[#C6DBEF] bg-white focus:outline-none focus:border-[#08519C]" />
         </div>
         <p id="login-err" class="text-xs text-rose-600 font-semibold hidden"></p>
-        <button type="submit" class="w-full py-3 rounded-xl bg-[#08306B] text-white font-bold hover:bg-[#08519C] transition">Sign In</button>
+        <button type="submit" class="w-full py-3 rounded-xl bg-[#08306B] text-white font-bold hover:bg-[#08519C] transition" data-i18n="signIn">Sign In</button>
       </form>
       <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
-        <button type="button" onclick="document.getElementById('sec-register').classList.toggle('hidden');document.getElementById('sec-forgot').classList.add('hidden')" class="font-bold text-black underline">New user? Register here</button>
-        <button type="button" onclick="document.getElementById('sec-forgot').classList.toggle('hidden');document.getElementById('sec-register').classList.add('hidden')" class="font-semibold text-slate-600 underline">Forgot Password?</button>
+        <button type="button" onclick="document.getElementById('sec-register').classList.toggle('hidden');document.getElementById('sec-forgot').classList.add('hidden')" class="font-bold text-black underline" data-i18n="newReg">New user? Register here</button>
+        <button type="button" onclick="document.getElementById('sec-forgot').classList.toggle('hidden');document.getElementById('sec-register').classList.add('hidden')" class="font-semibold text-slate-600 underline" data-i18n="forgot">Forgot Password?</button>
       </div>
     </section>
 
@@ -134,10 +134,10 @@
         <div><h2 id="cli-welcome" class="text-base font-bold">Welcome</h2><p class="text-xs text-slate-500">1st Case Lifecycle Free • Instant Advisor Directory &amp; Case Mail</p></div>
       </div>
       <div class="flex flex-wrap gap-2">
-        <button type="button" data-ctab="new-case" class="ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-black text-white">New Case</button>
-        <button type="button" data-ctab="my-cases" class="ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-800">My Cases &amp; Advisors</button>
-        <button type="button" data-ctab="mail" class="ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-800">Case Mail</button>
-        <button type="button" data-ctab="profile" class="ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-800">My Plan</button>
+        <button type="button" data-ctab="new-case" class="ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-black text-white" data-i18n="tabNewCase">New Case</button>
+        <button type="button" data-ctab="my-cases" class="ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-800" data-i18n="tabMyCases">My Cases &amp; Advisors</button>
+        <button type="button" data-ctab="mail" class="ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-800" data-i18n="tabMail">Case Mail</button>
+        <button type="button" data-ctab="profile" class="ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-800" data-i18n="tabPlan">My Plan</button>
       </div>
     </div>
 
@@ -149,7 +149,7 @@
 
     <section id="cview-new-case" class="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
-        <h3 class="text-base font-bold">File a Legal Case</h3>
+        <h3 class="text-base font-bold" data-i18n="fileCase">File a Legal Case</h3>
         <span id="live-case-preview" class="text-xs font-mono bg-slate-100 px-2.5 py-1 rounded-lg"></span>
       </div>
       <form id="form-new-case" class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
@@ -165,7 +165,7 @@
         <div class="sm:col-span-3 flex flex-wrap items-center justify-between gap-2">
           <button type="button" id="btn-gps" class="px-3 py-2 rounded-xl border border-slate-300 font-semibold hover:bg-slate-50">Attach GPS Location</button>
           <span id="gps-status" class="text-slate-500"></span>
-          <button type="submit" class="px-5 py-2.5 rounded-xl bg-black text-white font-bold hover:bg-zinc-800">Submit Case &amp; Find Advisors</button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-black text-white font-bold hover:bg-zinc-800" data-i18n="submitCase">Submit Case &amp; Find Advisors</button>
         </div>
       </form>
     </section>
