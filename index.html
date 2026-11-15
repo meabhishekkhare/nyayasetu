@@ -3,535 +3,784 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NyayaSetu • Verified Legal Intake &amp; Advisor Directory</title>
+  <title>NyayaSetu • Verified Legal Case Intake &amp; Advisor Directory</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-window.onerror = function(msg, src, line, col) {
-  var d = document.createElement('div');
-  d.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#dc2626;color:#fff;padding:8px 12px;font:12px monospace';
-  d.textContent = 'JS Error: ' + msg + ' (line ' + line + ')';
-  document.body && document.body.prepend(d);
-};
-</script>
-  <style>
-    :root {
-      --b0: #F7FBFF; --b1: #DEEBF7; --b2: #C6DBEF; --b3: #9ECAE1;
-      --b4: #6BAED6; --b5: #4292C6; --b6: #2171B5; --b7: #08519C; --b8: #08306B;
-    }
-    body { background-color: var(--b0); color: var(--b8); }
-    @keyframes swayScale {
-      0%, 100% { transform: rotate(-4deg) scale(1); }
-      50% { transform: rotate(4deg) scale(1.04); }
-    }
-    .scale-motion { animation: swayScale 3.2s ease-in-out infinite; transform-origin: 50% 18%; }
-    .role-btn { transition: all 0.25s cubic-bezier(.4,0,.2,1); }
-    .role-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(8, 81, 156, 0.14); }
-    @keyframes pulseDot { 0%, 100% { r: 5; opacity: 0.95; } 50% { r: 9; opacity: 0.45; } }
-    .map-pulse { animation: pulseDot 2s ease-in-out infinite; }
-  </style>
 </head>
-<body class="min-h-screen flex flex-col">
-  <header class="bg-[#08306B] text-white border-b border-[#08519C] sticky top-0 z-30 shadow-sm">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-      <div class="flex items-center gap-3 cursor-pointer" onclick="if(!session.userId) showWelcome()">
-        <div class="w-10 h-10 rounded-xl bg-[#DEEBF7] flex items-center justify-center shadow-inner">
-          <svg class="w-6 h-6 text-[#08519C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 3v18M5 21h14M4 7h16M6 7l-3 7h6l-3-7zM18 7l-3 7h6l-3-7z"/>
-          </svg>
-        </div>
+<body class="bg-[#F7FBFF] text-[#08306B] min-h-screen flex flex-col">
+  <header class="bg-[#08519C] text-white border-b border-[#08306B] sticky top-0 z-30 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-white text-[#08519C] flex items-center justify-center shadow-sm"><svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 21h14M4 7h16M6 7l-3 7h6l-3-7zM18 7l-3 7h6l-3-7z"/></svg></div>
         <div>
           <div class="flex items-center gap-2">
-            <span class="font-bold text-base tracking-tight text-white">NyayaSetu</span>
-            <span id="hdr-badge" class="hidden px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#2171B5] text-white"></span>
+            <span class="font-bold text-base">NyayaSetu</span>
+            <span id="hdr-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#08306B] text-[#DEEBF7]">Not Signed In</span>
           </div>
-          <p id="hdr-tagline" class="text-[11px] text-[#C6DBEF]">Verified Legal Case Intake, Advisor Directory &amp; Case Mail</p>
+          <p class="text-[11px] text-zinc-400">Verified Legal Case Intake, Advisor Directory &amp; Case Mail</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <select id="lang-select" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-[#08306B] border border-[#9ECAE1] focus:outline-none min-w-[130px]"></select>
-        <button id="btn-logout" type="button" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-[#2171B5] hover:bg-[#4292C6] text-white border border-[#6BAED6]">Logout</button>
+        <button id="btn-logout" type="button" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600 hover:bg-rose-500">Logout</button>
       </div>
     </div>
   </header>
 
-  <div id="toast" class="hidden fixed bottom-4 right-4 z-50 px-4 py-2.5 rounded-xl bg-[#08306B] text-white text-xs font-bold shadow-lg border border-[#4292C6]"></div>
-
-  <!-- WELCOME SCREEN (Translates to Role Selection -> Login) -->
-  <main id="win-welcome" class="max-w-3xl mx-auto w-full px-4 py-14 text-center space-y-6">
-    <div class="mx-auto w-24 h-24 rounded-3xl bg-[#DEEBF7] border-2 border-[#6BAED6] flex items-center justify-center shadow-md">
-      <svg class="w-14 h-14 text-[#08519C] scale-motion" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 3v18M5 21h14M4 7h16M6 7l-3 7h6l-3-7zM18 7l-3 7h6l-3-7z"/>
-      </svg>
-    </div>
-    <div class="space-y-2">
-      <h1 id="wlc-title" class="text-2xl sm:text-3xl font-extrabold text-[#08306B]">Justice Made Accessible Across India</h1>
-      <p id="wlc-sub" class="text-sm text-[#2171B5] max-w-xl mx-auto">Connect with verified independent legal advisors &amp; law firms.</p>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto pt-2">
-      <button type="button" onclick="enterAuthFromWelcome('client')" class="role-btn p-5 rounded-2xl bg-white border-2 border-[#9ECAE1] hover:border-[#08519C] text-left space-y-1.5">
-        <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#DEEBF7] text-[#08519C]">Requestee</span>
-        <h3 id="wlc-req-btn" class="text-base font-bold text-[#08306B]">I Need Legal Help</h3>
-        <p class="text-xs text-[#2171B5]">File a case, view ranked advisors &amp; handshake securely.</p>
-      </button>
-      <button type="button" onclick="enterAuthFromWelcome('advisor')" class="role-btn p-5 rounded-2xl bg-white border-2 border-[#9ECAE1] hover:border-[#08519C] text-left space-y-1.5">
-        <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#DEEBF7] text-[#08519C]">Advisor / Legal Firm</span>
-        <h3 id="wlc-adv-btn" class="text-base font-bold text-[#08306B]">I Am an Advisor / Law Firm</h3>
-        <p class="text-xs text-[#2171B5]">Independent advocates &amp; legal organisations.</p>
-      </button>
-    </div>
-  </main>
+  <div id="toast" class="hidden fixed bottom-4 right-4 z-50 px-4 py-2.5 rounded-xl bg-black text-white text-xs font-bold shadow-lg"></div>
 
   <!-- AUTH WINDOW -->
-  <main id="win-auth" class="hidden max-w-xl mx-auto w-full px-4 py-8 space-y-5">
-    <div class="flex items-center justify-between">
-      <button type="button" onclick="showWelcome()" class="text-xs font-bold text-[#08519C] hover:underline">&larr; Back to Welcome</button>
-      <div class="flex items-center gap-2 text-xs text-[#2171B5] font-semibold">
-        <svg class="w-5 h-5 text-[#08519C] scale-motion" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 21h14M4 7h16M6 7l-3 7h6l-3-7zM18 7l-3 7h6l-3-7z"/></svg>
-        <span>NyayaSetu Portal</span>
+  <main id="win-auth" class="max-w-md mx-auto w-full px-4 py-8 space-y-5">
+    <section class="bg-white rounded-3xl border border-[#C6DBEF] p-6 shadow-sm space-y-5">
+      <div class="text-center space-y-2.5">
+        <div class="mx-auto w-14 h-14 rounded-2xl bg-[#F7FBFF] border border-[#C6DBEF] flex items-center justify-center shadow-sm">
+          <svg class="w-8 h-8 text-[#08519C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 21h14M4 7h16M6 7l-3 7h6l-3-7zM18 7l-3 7h6l-3-7z"/></svg>
+        </div>
+        <span class="inline-block px-3 py-1 rounded-full bg-[#DEEBF7] text-[#08519C] text-[10px] font-bold tracking-wider uppercase">NyayaSetu • Verified Legal Network</span>
+        <h2 id="auth-who-title" class="text-2xl font-extrabold text-[#08306B]">Who are you?</h2>
+        <p id="auth-who-sub" class="text-xs text-[#2171B5] leading-relaxed">Choose Requestee to file a case &amp; find advisors, or Legal Advisor to manage your verified practice.</p>
       </div>
-    </div>
 
-    <div class="grid grid-cols-2 gap-2 bg-[#DEEBF7] p-1.5 rounded-2xl border border-[#9ECAE1]">
-      <button type="button" id="role-tab-client" onclick="setAuthRole('client')" class="role-btn py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#08519C] text-white">Requestee (Client)</button>
-      <button type="button" id="role-tab-advisor" onclick="setAuthRole('advisor')" class="role-btn py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-transparent text-[#08306B]">Advisor / Legal Firm</button>
-    </div>
+      <div class="grid grid-cols-2 gap-3">
+        <button type="button" id="role-tab-client" onclick="setAuthRole('client')" class="p-4 rounded-2xl border-2 border-[#2171B5] bg-[#F7FBFF] text-center space-y-2 transition">
+          <div class="mx-auto w-10 h-10 rounded-full bg-[#2171B5] text-white flex items-center justify-center">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="text-sm font-bold text-[#08306B]">Requestee</div>
+          <div class="text-[11px] text-[#2171B5]">File a case &amp; find advisors</div>
+        </button>
+        <button type="button" id="role-tab-advisor" onclick="setAuthRole('advisor')" class="p-4 rounded-2xl border border-[#C6DBEF] bg-white text-center space-y-2 transition">
+          <div class="mx-auto w-10 h-10 rounded-full bg-[#08306B] text-white flex items-center justify-center">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 21h14M4 7h16M6 7l-3 7h6l-3-7zM18 7l-3 7h6l-3-7z"/></svg>
+          </div>
+          <div class="text-sm font-bold text-[#08306B]">Legal Advisor</div>
+          <div class="text-[11px] text-[#2171B5]">Manage practice &amp; cases</div>
+        </button>
+      </div>
 
-    <section class="bg-white rounded-2xl border border-[#C6DBEF] p-6 shadow-sm space-y-4">
-      <div><h2 id="auth-signin-title" class="text-lg font-bold text-[#08306B]">Sign In as Requestee</h2><p class="text-xs text-[#2171B5]">Online cloud account • Instant access to your portal</p></div>
       <form id="form-login" class="space-y-3 text-sm">
-        <input id="login-email" type="email" required placeholder="Email address" class="w-full px-3 py-2 rounded-xl border border-[#9ECAE1] bg-[#F7FBFF]" />
-        <input id="login-pass" type="password" required placeholder="Password" class="w-full px-3 py-2 rounded-xl border border-[#9ECAE1] bg-[#F7FBFF]" />
+        <div>
+          <label class="block text-xs font-bold text-[#08306B] mb-1">Email or Phone *</label>
+          <input id="login-email" type="text" required placeholder="Email or 10-digit phone" class="w-full px-3.5 py-2.5 rounded-xl border border-[#C6DBEF] bg-[#DEEBF7]/40 focus:outline-none focus:border-[#08519C]" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#08306B] mb-1">Password *</label>
+          <input id="login-pass" type="password" required placeholder="Password" class="w-full px-3.5 py-2.5 rounded-xl border border-[#C6DBEF] bg-white focus:outline-none focus:border-[#08519C]" />
+        </div>
         <p id="login-err" class="text-xs text-rose-600 font-semibold hidden"></p>
-        <button type="submit" class="w-full py-2.5 rounded-xl bg-[#08519C] text-white font-bold hover:bg-[#08306B] transition">Sign In</button>
+        <button type="submit" class="w-full py-3 rounded-xl bg-[#08306B] text-white font-bold hover:bg-[#08519C] transition">Sign In</button>
       </form>
-      <div class="flex items-center justify-between pt-2 border-t border-[#DEEBF7] text-xs">
-        <button type="button" onclick="document.getElementById('sec-register').classList.toggle('hidden');document.getElementById('sec-forgot').classList.add('hidden')" class="font-bold text-[#08519C] underline">New Registration</button>
-        <button type="button" onclick="document.getElementById('sec-forgot').classList.toggle('hidden');document.getElementById('sec-register').classList.add('hidden')" class="font-semibold text-[#2171B5] underline">Forgot Password</button>
+      <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+        <button type="button" onclick="document.getElementById('sec-register').classList.toggle('hidden');document.getElementById('sec-forgot').classList.add('hidden')" class="font-bold text-black underline">New user? Register here</button>
+        <button type="button" onclick="document.getElementById('sec-forgot').classList.toggle('hidden');document.getElementById('sec-register').classList.add('hidden')" class="font-semibold text-slate-600 underline">Forgot Password?</button>
       </div>
     </section>
 
-    <section id="sec-forgot" class="hidden bg-white rounded-2xl border border-[#C6DBEF] p-6 shadow-sm space-y-3">
-      <div><h3 class="text-base font-bold text-[#08306B]">Reset Password</h3><p class="text-xs text-[#2171B5]">Verify your registered email &amp; phone</p></div>
+    <section id="sec-forgot" class="hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
+      <div><h3 class="text-base font-bold">Reset Password</h3><p class="text-xs text-slate-500">Verify your registered email &amp; phone to set a new password</p></div>
       <form id="form-forgot" class="space-y-2.5 text-xs">
-        <input id="fp-email" type="email" required placeholder="Registered Email" class="w-full px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-        <input id="fp-phone" type="text" required placeholder="Registered Phone (10 digits)" class="w-full px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-        <input id="fp-newpass" type="password" required placeholder="New Password" class="w-full px-3 py-2 rounded-xl border border-[#9ECAE1]" />
+        <input id="fp-email" type="email" required placeholder="Registered Email" class="w-full px-3 py-2 rounded-xl border border-slate-300" />
+        <input id="fp-phone" type="text" required placeholder="Registered Phone (10 digits)" class="w-full px-3 py-2 rounded-xl border border-slate-300" />
+        <input id="fp-newpass" type="password" required placeholder="New Password" class="w-full px-3 py-2 rounded-xl border border-slate-300" />
         <p id="fp-msg" class="text-xs font-semibold hidden"></p>
-        <button type="submit" class="w-full py-2.5 rounded-xl bg-[#2171B5] text-white font-bold hover:bg-[#08519C]">Update Password</button>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800">Update Password</button>
       </form>
     </section>
 
-    <section id="sec-register" class="hidden bg-white rounded-2xl border border-[#C6DBEF] p-6 shadow-sm space-y-4">
-      <div><h2 class="text-lg font-bold text-[#08306B]">Create Account</h2><p class="text-xs text-[#2171B5]">PIN code auto-fills State &amp; City</p></div>
+    <section id="sec-register" class="hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+      <div><h2 class="text-lg font-bold">Create Account</h2><p class="text-xs text-slate-500">Instant cloud sync • Client or Legal Advisor</p></div>
       <form id="form-register" class="space-y-2.5 text-xs">
         <div class="grid grid-cols-2 gap-2">
-          <select id="reg-role" class="px-3 py-2 rounded-xl border border-[#9ECAE1] font-semibold bg-[#F7FBFF]">
-            <option value="client">Requestee (Client)</option>
-            <option value="advisor">Independent Advisor</option>
-            <option value="firm">Legal Organisation (Firm)</option>
-          </select>
-          <input id="reg-name" type="text" required placeholder="Full Name / Firm Name" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
+          <select id="reg-role" class="px-3 py-2 rounded-xl border border-slate-300 font-semibold"><option value="client">Client (Seeking Advice)</option><option value="advisor">Legal Advisor</option></select>
+          <input id="reg-name" type="text" required placeholder="Full Name" class="px-3 py-2 rounded-xl border border-slate-300" />
         </div>
         <div class="grid grid-cols-2 gap-2">
-          <input id="reg-email" type="email" required placeholder="Email" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-          <input id="reg-phone" type="text" required placeholder="Phone (10 digits)" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
+          <input id="reg-email" type="email" required placeholder="Email" class="px-3 py-2 rounded-xl border border-slate-300" />
+          <input id="reg-phone" type="text" required placeholder="Phone (10 digits)" class="px-3 py-2 rounded-xl border border-slate-300" />
         </div>
         <div class="grid grid-cols-2 gap-2">
-          <input id="reg-pass" type="password" required placeholder="Password" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-          <input id="reg-pin" type="text" required maxlength="6" placeholder="PIN Code (auto-fills State/City)" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
+          <input id="reg-pass" type="password" required placeholder="Password" class="px-3 py-2 rounded-xl border border-slate-300" />
+          <input id="reg-pin" type="text" required maxlength="6" placeholder="PIN Code (6 digits)" class="px-3 py-2 rounded-xl border border-slate-300" />
         </div>
         <div class="grid grid-cols-2 gap-2">
-          <select id="reg-state" required class="px-3 py-2 rounded-xl border border-[#9ECAE1] bg-white"></select>
-          <select id="reg-city" required class="px-3 py-2 rounded-xl border border-[#9ECAE1] bg-white"></select>
+          <input id="reg-city" type="text" required placeholder="City" class="px-3 py-2 rounded-xl border border-slate-300" />
+          <input id="reg-state" type="text" required placeholder="State" class="px-3 py-2 rounded-xl border border-slate-300" />
         </div>
         <div id="reg-advisor-fields" class="hidden grid grid-cols-2 gap-2 pt-1">
-          <div class="col-span-2">
-            <input id="reg-licence" type="text" placeholder="Bar Licence No. (Format: STATE/1234/YEAR e.g. MP/1042/2018)" class="w-full px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-            <p class="text-[10px] text-[#2171B5] mt-0.5">Mandatory for Advisors &amp; Legal Firms • Format: STATE/NUMBER/YEAR</p>
-          </div>
-          <input id="reg-exp" type="number" min="0" placeholder="Years Experience" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-          <input id="reg-spec" type="text" placeholder="Specialisations (Civil, Criminal...)" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-          <input id="reg-firm-parent" type="text" placeholder="Associated Firm Name (if any)" class="col-span-2 hidden px-3 py-2 rounded-xl border border-[#9ECAE1]" />
+          <input id="reg-licence" type="text" placeholder="Bar Licence No." class="px-3 py-2 rounded-xl border border-slate-300" />
+          <input id="reg-exp" type="number" min="0" placeholder="Years Experience" class="px-3 py-2 rounded-xl border border-slate-300" />
+          <input id="reg-spec" type="text" placeholder="Specialisations (e.g. Civil, Criminal)" class="col-span-2 px-3 py-2 rounded-xl border border-slate-300" />
         </div>
         <p id="reg-err" class="text-xs text-rose-600 font-semibold hidden"></p>
-        <button type="submit" class="w-full py-2.5 rounded-xl bg-[#08519C] text-white font-bold hover:bg-[#08306B]">Register &amp; Continue</button>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800">Register &amp; Continue</button>
       </form>
     </section>
   </main>
 
   <!-- CLIENT WINDOW -->
   <main id="win-client" class="hidden max-w-6xl mx-auto w-full px-4 py-6 space-y-5">
-    <div class="bg-white rounded-2xl border-2 border-[#08519C] p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+    <div class="bg-white rounded-2xl border-2 border-black p-4 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <div id="cli-avatar" class="w-11 h-11 rounded-full bg-[#08519C] text-white font-bold flex items-center justify-center text-sm">CL</div>
-        <div><h2 id="cli-welcome" class="text-base font-bold text-[#08306B]">Welcome</h2><p class="text-xs text-[#2171B5]">1st Case Lifecycle Free • Instant Advisor Directory, Handshake &amp; Case Mail</p></div>
+        <div id="cli-avatar" class="w-11 h-11 rounded-full bg-black text-white font-bold flex items-center justify-center text-sm">CL</div>
+        <div><h2 id="cli-welcome" class="text-base font-bold">Welcome</h2><p class="text-xs text-slate-500">1st Case Lifecycle Free • Instant Advisor Directory &amp; Case Mail</p></div>
       </div>
       <div class="flex flex-wrap gap-2">
-        <button type="button" data-ctab="new-case" class="ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-[#08519C] text-white">New Case</button>
-        <button type="button" data-ctab="my-cases" class="ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-[#DEEBF7] text-[#08306B]">My Cases &amp; Handshake</button>
-        <button type="button" data-ctab="notifications" class="ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-[#DEEBF7] text-[#08306B]">Notifications</button>
-        <button type="button" data-ctab="mail" class="ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-[#DEEBF7] text-[#08306B]">Case Mail</button>
-        <button type="button" data-ctab="profile" class="ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-[#DEEBF7] text-[#08306B]">My Plan</button>
+        <button type="button" data-ctab="new-case" class="ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-black text-white">New Case</button>
+        <button type="button" data-ctab="my-cases" class="ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-800">My Cases &amp; Advisors</button>
+        <button type="button" data-ctab="mail" class="ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-800">Case Mail</button>
+        <button type="button" data-ctab="profile" class="ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-800">My Plan</button>
       </div>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      <div class="bg-white p-4 rounded-2xl border border-[#C6DBEF]"><p class="text-xs text-[#2171B5]">My Cases</p><p id="cli-stat-cases" class="text-2xl font-bold mt-1 text-[#08306B]">0</p></div>
-      <div class="bg-white p-4 rounded-2xl border border-[#C6DBEF]"><p class="text-xs text-[#2171B5]">Advisors Unlocked</p><p id="cli-stat-unlocked" class="text-2xl font-bold mt-1 text-[#08306B]">0</p></div>
-      <div class="bg-white p-4 rounded-2xl border border-[#C6DBEF]"><p class="text-xs text-[#2171B5]">Closed Lifecycles</p><p id="cli-stat-closed" class="text-2xl font-bold mt-1 text-[#08519C]">0</p></div>
-      <div class="bg-white p-4 rounded-2xl border border-[#C6DBEF]"><p class="text-xs text-[#2171B5]">Paid Credits Left</p><p id="cli-stat-credits" class="text-2xl font-bold mt-1 text-[#08306B]">0</p></div>
+    <div class="grid grid-cols-3 gap-3">
+      <div class="bg-white p-4 rounded-2xl border border-slate-200"><p class="text-xs text-slate-500">My Cases</p><p id="cli-stat-cases" class="text-2xl font-bold mt-1">0</p></div>
+      <div class="bg-white p-4 rounded-2xl border border-slate-200"><p class="text-xs text-slate-500">Advisors Unlocked</p><p id="cli-stat-unlocked" class="text-2xl font-bold mt-1">0</p></div>
+      <div class="bg-white p-4 rounded-2xl border border-slate-200"><p class="text-xs text-slate-500">Paid Credits Left</p><p id="cli-stat-credits" class="text-2xl font-bold mt-1">0</p></div>
     </div>
 
-    <section id="cview-new-case" class="bg-white rounded-2xl border border-[#C6DBEF] p-5 space-y-4">
+    <section id="cview-new-case" class="bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
-        <h3 id="lbl-new-case" class="text-base font-bold text-[#08306B]">File a Legal Case</h3>
-        <span id="live-case-preview" class="text-xs font-mono bg-[#DEEBF7] text-[#08306B] px-2.5 py-1 rounded-lg font-bold"></span>
+        <h3 class="text-base font-bold">File a Legal Case</h3>
+        <span id="live-case-preview" class="text-xs font-mono bg-slate-100 px-2.5 py-1 rounded-lg"></span>
       </div>
       <form id="form-new-case" class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-        <select id="case-primary" class="px-3 py-2 rounded-xl border border-[#9ECAE1] font-semibold bg-[#F7FBFF]"></select>
-        <select id="case-secondary" class="px-3 py-2 rounded-xl border border-[#9ECAE1] font-semibold bg-[#F7FBFF]"></select>
-        <input id="case-pin" type="text" required maxlength="6" placeholder="PIN Code (auto-fills)" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-        <select id="case-state" required class="px-3 py-2 rounded-xl border border-[#9ECAE1] bg-white"></select>
-        <select id="case-city" required class="px-3 py-2 rounded-xl border border-[#9ECAE1] bg-white"></select>
-        <input id="case-subject" type="text" required placeholder="Short Subject (e.g. Unpaid property refund)" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-        <div class="sm:col-span-3 relative">
-          <textarea id="case-summary" rows="3" required placeholder="Describe your legal issue briefly..." class="w-full px-3 py-2 rounded-xl border border-[#9ECAE1] pr-28"></textarea>
-          <button type="button" id="btn-voice" class="absolute right-2 bottom-2 px-3 py-1 rounded-lg bg-[#DEEBF7] text-[#08519C] font-bold hover:bg-[#C6DBEF]">Voice Input</button>
-        </div>
-        <div class="sm:col-span-3 p-3 rounded-xl bg-[#F7FBFF] border border-[#C6DBEF] space-y-1">
-          <p class="font-bold text-[#08306B]">Legal Suggestion Box (Based on Selected Category):</p>
-          <p id="legal-suggest-type" class="text-[#08519C] font-semibold"></p>
-          <p id="legal-suggest-law" class="text-[#2171B5]"></p>
-        </div>
+        <select id="case-type" class="px-3 py-2 rounded-xl border border-slate-300 font-semibold">
+          <option>Civil / Property</option><option>Criminal / Bail</option><option>Family / Matrimonial</option>
+          <option>Consumer / Fraud</option><option>Corporate / Contract</option><option>Cyber / IT</option><option>Labour / Employment</option>
+        </select>
+        <input id="case-pin" type="text" required maxlength="6" placeholder="PIN Code" class="px-3 py-2 rounded-xl border border-slate-300" />
+        <input id="case-city" type="text" required placeholder="City" class="px-3 py-2 rounded-xl border border-slate-300" />
+        <input id="case-state" type="text" required placeholder="State" class="px-3 py-2 rounded-xl border border-slate-300" />
+        <input id="case-subject" type="text" required placeholder="Short Subject (e.g. Unpaid property refund)" class="sm:col-span-2 px-3 py-2 rounded-xl border border-slate-300" />
+        <textarea id="case-summary" rows="3" required placeholder="Describe your legal issue briefly..." class="sm:col-span-3 px-3 py-2 rounded-xl border border-slate-300"></textarea>
         <div class="sm:col-span-3 flex flex-wrap items-center justify-between gap-2">
-          <button type="button" id="btn-gps" class="px-3 py-2 rounded-xl border border-[#9ECAE1] font-semibold text-[#08519C] hover:bg-[#DEEBF7]">Attach GPS Location</button>
-          <span id="gps-status" class="text-[#2171B5]"></span>
-          <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#08519C] text-white font-bold hover:bg-[#08306B]">Submit Case &amp; Find Advisors</button>
+          <button type="button" id="btn-gps" class="px-3 py-2 rounded-xl border border-slate-300 font-semibold hover:bg-slate-50">Attach GPS Location</button>
+          <span id="gps-status" class="text-slate-500"></span>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-black text-white font-bold hover:bg-zinc-800">Submit Case &amp; Find Advisors</button>
         </div>
       </form>
     </section>
 
     <section id="cview-my-cases" class="hidden space-y-4">
       <div id="cli-cases-list" class="space-y-3"></div>
-      <div id="cli-advisors-panel" class="hidden bg-white rounded-2xl border border-[#C6DBEF] p-5 space-y-3">
+      <div id="cli-advisors-panel" class="hidden bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <div><h3 class="text-sm font-bold text-[#08306B]">Ranked Advisors &amp; Legal Firms for <span id="cw-case-num" class="font-mono"></span></h3><p id="cw-scope-note" class="text-xs text-[#2171B5]"></p></div>
+          <div><h3 class="text-sm font-bold">Ranked Legal Advisors for <span id="cw-case-num" class="font-mono"></span></h3><p id="cw-scope-note" class="text-xs text-slate-500"></p></div>
           <div class="flex gap-2 text-xs">
-            <select id="cw-scope-filter" class="px-2.5 py-1.5 rounded-lg border border-[#9ECAE1]"><option value="all">All Locations</option><option value="state">Same State</option><option value="city">Same City</option><option value="pin">Same PIN</option></select>
-            <input id="cw-spec-filter" type="text" placeholder="Filter law or name..." class="px-2.5 py-1.5 rounded-lg border border-[#9ECAE1]" />
+            <select id="cw-scope-filter" class="px-2.5 py-1.5 rounded-lg border border-slate-300"><option value="all">All Locations</option><option value="state">Same State</option><option value="city">Same City</option><option value="pin">Same PIN</option></select>
+            <input id="cw-spec-filter" type="text" placeholder="Filter law or name..." class="px-2.5 py-1.5 rounded-lg border border-slate-300" />
           </div>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs border-collapse">
-            <thead><tr class="border-b border-[#C6DBEF] text-[#2171B5]"><th class="p-2">Rank</th><th class="p-2">Advisor / Firm &amp; Licence</th><th class="p-2">Specialisations</th><th class="p-2">Location</th><th class="p-2">Fee Range</th><th class="p-2">Contact &amp; Action</th></tr></thead>
-            <tbody id="cw-advisors-tbody" class="divide-y divide-[#DEEBF7]"></tbody>
+            <thead><tr class="border-b border-slate-200 text-slate-500"><th class="p-2">Rank</th><th class="p-2">Advisor &amp; Licence</th><th class="p-2">Specialisations</th><th class="p-2">Location</th><th class="p-2">Fee Range</th><th class="p-2">Contact &amp; Action</th></tr></thead>
+            <tbody id="cw-advisors-tbody" class="divide-y divide-slate-100"></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <section id="cview-notifications" class="hidden bg-white rounded-2xl border border-[#C6DBEF] p-5 space-y-3">
-      <h3 class="text-sm font-bold text-[#08306B]">Client Notifications &amp; 24h Handshake Reminders</h3>
-      <div id="cli-notifs-list" class="space-y-2 text-xs"></div>
-    </section>
-
-    <section id="cview-mail" class="hidden bg-white rounded-2xl border border-[#C6DBEF] p-5 space-y-3">
-      <h3 class="text-sm font-bold text-[#08306B]">Case Mail</h3>
+    <section id="cview-mail" class="hidden bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
+      <h3 class="text-sm font-bold">Case Mail</h3>
       <div id="cli-mail-list" class="space-y-2 text-xs"></div>
-      <form id="form-cli-mail" class="flex flex-wrap gap-2 pt-2 border-t border-[#DEEBF7] text-xs">
-        <select id="cli-mail-to" class="px-3 py-2 rounded-xl border border-[#9ECAE1]"></select>
-        <input id="cli-mail-body" type="text" required placeholder="Write message..." class="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-        <button type="submit" class="px-4 py-2 rounded-xl bg-[#08519C] text-white font-bold">Send</button>
+      <form id="form-cli-mail" class="flex flex-wrap gap-2 pt-2 border-t border-slate-200 text-xs">
+        <select id="cli-mail-to" class="px-3 py-2 rounded-xl border border-slate-300"></select>
+        <input id="cli-mail-body" type="text" required placeholder="Write message to advisor..." class="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-slate-300" />
+        <button type="submit" class="px-4 py-2 rounded-xl bg-black text-white font-bold">Send</button>
       </form>
     </section>
 
-    <section id="cview-profile" class="hidden bg-white rounded-2xl border border-[#C6DBEF] p-5 space-y-3"></section>
+    <section id="cview-profile" class="hidden bg-white rounded-2xl border border-slate-200 p-5 space-y-3"></section>
   </main>
 
-  <!-- ADVISOR & LEGAL FIRM WINDOW -->
+  <!-- ADVISOR WINDOW -->
   <main id="win-advisor" class="hidden max-w-6xl mx-auto w-full px-4 py-6 space-y-5">
-    <div class="bg-white rounded-2xl border-2 border-[#08519C] p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+    <div class="bg-white rounded-2xl border-2 border-black p-4 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <div id="adv-avatar" class="w-11 h-11 rounded-full bg-[#08519C] text-white font-bold flex items-center justify-center text-sm">LA</div>
-        <div><h2 id="adv-welcome" class="text-base font-bold text-[#08306B]">Welcome</h2><p id="adv-subhead" class="text-xs text-[#2171B5]">Verified Practice Portal • First 3 client contacts free from Case Pools.</p></div>
+        <div id="adv-avatar" class="w-11 h-11 rounded-full bg-black text-white font-bold flex items-center justify-center text-sm">LA</div>
+        <div><h2 id="adv-welcome" class="text-base font-bold">Welcome</h2><p class="text-xs text-slate-500">Verified Practice Portal • First 3 client contact numbers free from the case pool.</p></div>
       </div>
       <div class="flex flex-wrap gap-2">
-        <button type="button" data-atab="requests" class="atab px-3 py-1.5 rounded-xl text-xs font-bold bg-[#08519C] text-white">Case Pools &amp; Map</button>
-        <button type="button" data-atab="notifications" class="atab px-3 py-1.5 rounded-xl text-xs font-bold bg-[#DEEBF7] text-[#08306B]">Notifications</button>
-        <button type="button" data-atab="profile" class="atab px-3 py-1.5 rounded-xl text-xs font-bold bg-[#DEEBF7] text-[#08306B]">My Profile / Team</button>
-        <button type="button" data-atab="mail" class="atab px-3 py-1.5 rounded-xl text-xs font-bold bg-[#DEEBF7] text-[#08306B]">Mail Box</button>
+        <button type="button" data-atab="requests" class="atab px-3 py-1.5 rounded-xl text-xs font-bold bg-black text-white">Requests &amp; Pool</button>
+        <button type="button" data-atab="profile" class="atab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-800">My Profile</button>
+        <button type="button" data-atab="mail" class="atab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-800">Mail Box</button>
       </div>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      <div class="bg-white p-4 rounded-2xl border border-[#C6DBEF]"><p class="text-xs text-[#2171B5]">Client Requests</p><p id="adv-stat-reqs" class="text-2xl font-bold mt-1 text-[#08306B]">0</p></div>
-      <div class="bg-white p-4 rounded-2xl border border-[#C6DBEF]"><p class="text-xs text-[#2171B5]">Contacts Left</p><p id="adv-stat-free" class="text-2xl font-bold mt-1 text-[#08306B]">3 / 3</p></div>
-      <div class="bg-white p-4 rounded-2xl border border-[#C6DBEF]"><p class="text-xs text-[#2171B5]">Closed Lifecycles</p><p id="adv-stat-closed" class="text-2xl font-bold mt-1 text-[#08519C]">0</p></div>
-      <div class="bg-white p-4 rounded-2xl border border-[#C6DBEF]">
-        <div class="flex items-center justify-between"><p class="text-xs text-[#2171B5]">Profile Completeness</p><span id="adv-comp-pct" class="text-xs font-bold text-[#08519C]">0%</span></div>
-        <div class="w-full h-2 bg-[#DEEBF7] rounded-full mt-2 overflow-hidden"><div id="adv-comp-bar" class="h-2 bg-[#08519C] rounded-full transition-all" style="width:0%"></div></div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div class="bg-white p-4 rounded-2xl border border-slate-200"><p class="text-xs text-slate-500">Client Requests</p><p id="adv-stat-reqs" class="text-2xl font-bold mt-1">0</p></div>
+      <div class="bg-white p-4 rounded-2xl border border-slate-200"><p class="text-xs text-slate-500">Contacts Left (Free + Paid)</p><p id="adv-stat-free" class="text-2xl font-bold mt-1">3 / 3</p></div>
+      <div class="bg-white p-4 rounded-2xl border border-slate-200">
+        <div class="flex items-center justify-between"><p class="text-xs text-slate-500">Profile Completeness</p><span id="adv-comp-pct" class="text-xs font-bold">0%</span></div>
+        <div class="w-full h-2 bg-slate-200 rounded-full mt-2 overflow-hidden"><div id="adv-comp-bar" class="h-2 bg-black rounded-full transition-all" style="width:0%"></div></div>
       </div>
     </div>
 
-    <div id="advisor-sub-banner" class="bg-white rounded-2xl border border-[#C6DBEF] px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-xs"></div>
+    <div id="advisor-sub-banner" class="bg-white rounded-2xl border border-slate-200 px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-xs"></div>
 
     <section id="aview-requests" class="space-y-4">
-      <!-- INDIA CASE HEAT MAP -->
-      <div class="bg-white rounded-2xl border border-[#C6DBEF] p-5 space-y-2">
-        <div class="flex items-center justify-between">
-          <div><h3 class="text-sm font-bold text-[#08306B]">India Case Heat Map</h3><p class="text-xs text-[#2171B5]">Live geographical distribution of open cases in the pool</p></div>
-          <span id="map-case-count" class="px-2.5 py-1 rounded-lg bg-[#DEEBF7] text-[#08519C] text-xs font-bold">0 Open Cases</span>
-        </div>
-        <div class="bg-[#F7FBFF] border border-[#DEEBF7] rounded-xl p-3 flex flex-col sm:flex-row items-center gap-4">
-          <svg id="india-case-map" viewBox="0 0 300 340" class="w-56 h-64 shrink-0">
-            <path d="M125,18 L152,25 L168,52 L195,75 L220,90 L255,95 L270,118 L242,140 L215,155 L202,190 L165,245 L140,305 L122,320 L108,285 L92,235 L72,195 L45,165 L38,132 L68,105 L95,78 L110,45 Z" fill="#DEEBF7" stroke="#4292C6" stroke-width="2"/>
-            <g id="map-dots"></g>
-          </svg>
-          <div id="map-legend" class="flex-1 text-xs space-y-1.5 text-[#08306B]"></div>
-        </div>
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
+        <h3 class="text-sm font-bold">Incoming Client Reach Requests</h3>
+        <div id="advisor-notifications-list" class="space-y-2.5"></div>
       </div>
-
-      <div class="bg-white rounded-2xl border border-[#C6DBEF] p-5 space-y-3">
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <div><h3 id="lbl-case-pool" class="text-sm font-bold text-[#08306B]">Case Pools (Latest to Oldest)</h3><p class="text-xs text-[#2171B5]">Locked cases are automatically removed from the open pool</p></div>
-          <input id="adv-pool-filter" type="text" placeholder="Filter by city, PIN, or law..." class="px-3 py-1.5 rounded-xl border border-[#9ECAE1] text-xs" />
+          <div><h3 class="text-sm font-bold">Open Case Pool</h3><p class="text-xs text-slate-500">Browse active cases and unlock client contact numbers</p></div>
+          <input id="adv-pool-filter" type="text" placeholder="Filter by city, PIN, or law..." class="px-3 py-1.5 rounded-xl border border-slate-300 text-xs" />
         </div>
         <div id="advisor-case-pool-list" class="space-y-2.5"></div>
       </div>
     </section>
 
-    <section id="aview-notifications" class="hidden bg-white rounded-2xl border border-[#C6DBEF] p-5 space-y-3">
-      <h3 class="text-sm font-bold text-[#08306B]">Incoming Client Reach Requests &amp; Handshake Alerts</h3>
-      <div id="advisor-notifications-list" class="space-y-2.5"></div>
-    </section>
-
-    <section id="aview-profile" class="hidden bg-white rounded-2xl border border-[#C6DBEF] p-5 space-y-4">
-      <h3 class="text-sm font-bold text-[#08306B]">Profile &amp; Bar Licence Details</h3>
+    <section id="aview-profile" class="hidden bg-white rounded-2xl border border-slate-200 p-5 space-y-4">
+      <h3 class="text-sm font-bold">Advisor Profile (Updates Completeness Bar Live)</h3>
       <form id="form-adv-profile" class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-        <input id="ap-licence" type="text" required placeholder="Bar Licence (STATE/1234/YEAR)" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-        <input id="ap-college" type="text" placeholder="Law College" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-        <input id="ap-university" type="text" placeholder="University" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-        <input id="ap-year" type="text" placeholder="Passing Year" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-        <input id="ap-exp" type="number" min="0" placeholder="Years of Experience" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-        <input id="ap-spec" type="text" placeholder="Specialisations (comma sep)" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-        <input id="ap-fmin" type="number" placeholder="Fee Min (₹)" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-        <input id="ap-fmax" type="number" placeholder="Fee Max (₹)" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-        <input id="ap-city" type="text" placeholder="City" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-        <textarea id="ap-bio" rows="3" placeholder="Short practice bio..." class="sm:col-span-3 px-3 py-2 rounded-xl border border-[#9ECAE1]"></textarea>
-        <button type="submit" class="sm:col-span-3 py-2.5 rounded-xl bg-[#08519C] text-white font-bold hover:bg-[#08306B]">Save Profile to Cloud</button>
+        <input id="ap-licence" type="text" placeholder="Bar Licence Number" class="px-3 py-2 rounded-xl border border-slate-300" />
+        <input id="ap-college" type="text" placeholder="Law College" class="px-3 py-2 rounded-xl border border-slate-300" />
+        <input id="ap-university" type="text" placeholder="University" class="px-3 py-2 rounded-xl border border-slate-300" />
+        <input id="ap-year" type="text" placeholder="Passing Year" class="px-3 py-2 rounded-xl border border-slate-300" />
+        <input id="ap-exp" type="number" min="0" placeholder="Years of Experience" class="px-3 py-2 rounded-xl border border-slate-300" />
+        <input id="ap-spec" type="text" placeholder="Specialisations (comma sep)" class="px-3 py-2 rounded-xl border border-slate-300" />
+        <input id="ap-fmin" type="number" placeholder="Fee Min (₹)" class="px-3 py-2 rounded-xl border border-slate-300" />
+        <input id="ap-fmax" type="number" placeholder="Fee Max (₹)" class="px-3 py-2 rounded-xl border border-slate-300" />
+        <input id="ap-city" type="text" placeholder="City" class="px-3 py-2 rounded-xl border border-slate-300" />
+        <textarea id="ap-bio" rows="3" placeholder="Short practice bio..." class="sm:col-span-3 px-3 py-2 rounded-xl border border-slate-300"></textarea>
+        <button type="submit" class="sm:col-span-3 py-2.5 rounded-xl bg-black text-white font-bold hover:bg-zinc-800">Save Profile to Cloud</button>
       </form>
-      <div id="firm-team-box" class="hidden pt-4 border-t border-[#DEEBF7] space-y-3">
-        <h4 class="text-sm font-bold text-[#08306B]">Legal Organisation Team Advisors</h4>
-        <div id="firm-team-list" class="space-y-1.5 text-xs"></div>
-        <form id="form-add-firm-adv" class="grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs">
-          <input id="fa-name" type="text" required placeholder="Advisor Name" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-          <input id="fa-licence" type="text" required placeholder="Bar Licence (MP/123/2020)" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-          <input id="fa-spec" type="text" required placeholder="Specialisation" class="px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-          <button type="submit" class="px-3 py-2 rounded-xl bg-[#2171B5] text-white font-bold">+ Add Team Advisor</button>
-        </form>
-      </div>
     </section>
 
-    <section id="aview-mail" class="hidden bg-white rounded-2xl border border-[#C6DBEF] p-5 space-y-3">
-      <h3 class="text-sm font-bold text-[#08306B]">Case Mail Box</h3>
+    <section id="aview-mail" class="hidden bg-white rounded-2xl border border-slate-200 p-5 space-y-3">
+      <h3 class="text-sm font-bold">Case Mail Box</h3>
       <div id="adv-mail-list" class="space-y-2 text-xs"></div>
-      <form id="form-adv-mail" class="flex flex-wrap gap-2 pt-2 border-t border-[#DEEBF7] text-xs">
-        <select id="adv-mail-to" class="px-3 py-2 rounded-xl border border-[#9ECAE1]"></select>
-        <input id="adv-mail-body" type="text" required placeholder="Reply to client..." class="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-        <button type="submit" class="px-4 py-2 rounded-xl bg-[#08519C] text-white font-bold">Send</button>
+      <form id="form-adv-mail" class="flex flex-wrap gap-2 pt-2 border-t border-slate-200 text-xs">
+        <select id="adv-mail-to" class="px-3 py-2 rounded-xl border border-slate-300"></select>
+        <input id="adv-mail-body" type="text" required placeholder="Reply to client..." class="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-slate-300" />
+        <button type="submit" class="px-4 py-2 rounded-xl bg-black text-white font-bold">Send</button>
       </form>
     </section>
   </main>
 
   <!-- UPI SUBSCRIPTION MODAL -->
-  <div id="upi-modal" class="hidden fixed inset-0 z-50 bg-[#08306B]/60 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 border border-[#6BAED6]">
-      <div class="flex items-center justify-between"><h3 class="text-base font-bold text-[#08306B]">Unlock via UPI / Subscription</h3><button id="btn-close-upi" type="button" class="text-xs font-bold px-2.5 py-1 rounded bg-[#DEEBF7] text-[#08306B]">Close</button></div>
+  <div id="upi-modal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-5 space-y-4">
+      <div class="flex items-center justify-between"><h3 class="text-base font-bold">Unlock via UPI / Subscription</h3><button id="btn-close-upi" type="button" class="text-xs font-bold px-2 py-1 rounded bg-slate-100">Close</button></div>
       <div id="upi-plans-list" class="space-y-2 text-xs"></div>
-      <div id="upi-pay-box" class="hidden border-t border-[#DEEBF7] pt-3 space-y-2 text-xs">
-        <p class="font-bold text-[#08306B]">Pay ₹<span id="upi-amt"></span> to <span id="upi-vpa-lbl" class="font-mono"></span></p>
-        <img id="upi-qr" alt="UPI QR" class="w-40 h-40 mx-auto border border-[#9ECAE1] rounded-xl" />
-        <a id="upi-intent-link" href="#" class="block text-center py-2 rounded-xl bg-[#08519C] text-white font-bold">Open UPI App to Pay</a>
+      <div id="upi-pay-box" class="hidden border-t border-slate-200 pt-3 space-y-2 text-xs">
+        <p class="font-bold">Pay ₹<span id="upi-amt"></span> to <span id="upi-vpa-lbl" class="font-mono"></span></p>
+        <img id="upi-qr" alt="UPI QR" class="w-40 h-40 mx-auto border rounded-xl" />
+        <a id="upi-intent-link" href="#" class="block text-center py-2 rounded-xl bg-emerald-600 text-white font-bold">Open UPI App to Pay</a>
         <form id="form-utr" class="flex gap-2">
-          <input id="utr-input" type="text" required placeholder="Enter 12-digit UTR / Ref No." class="flex-1 px-3 py-2 rounded-xl border border-[#9ECAE1]" />
-          <button type="submit" class="px-4 py-2 rounded-xl bg-[#08306B] text-white font-bold">Submit UTR</button>
+          <input id="utr-input" type="text" required placeholder="Enter 12-digit UTR / Ref No." class="flex-1 px-3 py-2 rounded-xl border border-slate-300" />
+          <button type="submit" class="px-4 py-2 rounded-xl bg-black text-white font-bold">Submit UTR</button>
         </form>
       </div>
     </div>
-  </div>  <script>
-let db = { users: [], cases: [], messages: [], notifications: [], payments: [], subscriptionRules: null, upiVpa: 'nyayasetu@upi', upiName: 'NyayaSetu Legal Directory' };
-let session = { userId: sessionStorage.getItem('nyaya_uid') || null, authRole: 'client', activeCaseId: null, gps: null, selectedPlan: null, lang: localStorage.getItem('nyaya_lang') || 'en' };
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-const initials = n => (n || 'U').trim().split(/\s+/).slice(0,2).map(x => x[0]?.toUpperCase() || '').join('') || 'U';
-function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.remove('hidden'); setTimeout(() => t.classList.add('hidden'), 3200); }
+  </div>
+  <script>
+    let db = { users: [], cases: [], messages: [], notifications: [], payments: [], subscriptionRules: null, upiVpa: 'nyayasetu@upi', upiName: 'NyayaSetu Legal Directory' };
+    let session = { userId: sessionStorage.getItem('nyaya_uid') || null, authRole: 'client', activeCaseId: null, gps: null, selectedPlan: null };
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    const initials = n => (n || 'U').trim().split(/\s+/).slice(0,2).map(x => x[0]?.toUpperCase() || '').join('') || 'U';
+    function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.remove('hidden'); setTimeout(() => t.classList.add('hidden'), 3200); }
 
-async function loadCloud() {
-  const r = await fetch('/api/app-data?t=' + Date.now());
-  const d = await r.json();
-  if (d && d.payload) db = d.payload;
-}
-
-async function syncCloud(partial) {
-  const r = await fetch('/api/sync-mutation', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(partial) });
-  if (!r.ok) throw new Error('Cloud sync failed');
-  await loadCloud();
-}
-
-function curUser() { return (db.users || []).find(u => u.id === session.userId) || null; }
-
-function populateLanguages() {
-  const sel = document.getElementById('lang-select');
-  sel.innerHTML = (window.NYAYA_LANGUAGES || []).map(l => `<option value="${l.code}">${l.label}</option>`).join('');
-  sel.value = session.lang;
-  applyLanguage(session.lang);
-}
-
-function applyLanguage(code) {
-  session.lang = code; localStorage.setItem('nyaya_lang', code);
-  const t = (window.NYAYA_I18N && window.NYAYA_I18N[code]) || window.NYAYA_I18N.en;
-  document.getElementById('hdr-tagline').textContent = t.tagline;
-  document.getElementById('wlc-title').textContent = t.welcomeTitle;
-  document.getElementById('wlc-sub').textContent = t.welcomeSub;
-  document.getElementById('lbl-new-case').textContent = t.newCase;
-  document.getElementById('lbl-case-pool').textContent = t.casePool;
-}
-
-function populateStatesAndCities(stateId, cityId, preState, preCity) {
-  const stEl = document.getElementById(stateId), ctEl = document.getElementById(cityId);
-  const states = Object.keys(window.NYAYA_STATES || {});
-  stEl.innerHTML = states.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
-  if (preState && states.includes(preState)) stEl.value = preState;
-  const updateCities = (targetCity) => {
-    const cities = (window.NYAYA_STATES[stEl.value] || []).slice();
-    if (targetCity && !cities.includes(targetCity)) cities.unshift(targetCity);
-    ctEl.innerHTML = cities.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
-    if (targetCity) ctEl.value = targetCity;
-  };
-  stEl.onchange = () => updateCities();
-  updateCities(preCity);
-}
-
-async function lookupPin(pin, stateId, cityId) {
-  if (!/^\d{6}$/.test(pin)) return;
-  try {
-    const res = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
-    const data = await res.json();
-    const po = data?.[0]?.PostOffice?.[0];
-    if (po && po.State) {
-      const stEl = document.getElementById(stateId), ctEl = document.getElementById(cityId);
-      if (![...stEl.options].some(o => o.value === po.State)) stEl.add(new Option(po.State, po.State));
-      stEl.value = po.State;
-      const dist = po.District || po.Block || po.Name;
-      const cities = (window.NYAYA_STATES[po.State] || []).slice();
-      if (dist && !cities.includes(dist)) cities.unshift(dist);
-      ctEl.innerHTML = cities.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
-      if (dist) ctEl.value = dist;
-      toast(`PIN ${pin}: ${dist}, ${po.State}`);
+    function setAuthRole(role) {
+      session.authRole = role;
+      const isAdv = role === 'advisor';
+      document.getElementById('role-tab-client').className = !isAdv ? 'p-4 rounded-2xl border-2 border-[#2171B5] bg-[#F7FBFF] text-center space-y-2 transition' : 'p-4 rounded-2xl border border-[#C6DBEF] bg-white text-center space-y-2 transition';
+      document.getElementById('role-tab-advisor').className = isAdv ? 'p-4 rounded-2xl border-2 border-[#2171B5] bg-[#F7FBFF] text-center space-y-2 transition' : 'p-4 rounded-2xl border border-[#C6DBEF] bg-white text-center space-y-2 transition';
+      
+      const regRole = document.getElementById('reg-role');
+      if (regRole) {
+        regRole.value = role;
+        document.getElementById('reg-advisor-fields').classList.toggle('hidden', !isAdv);
+      }
     }
-  } catch {}
-}
 
-function populateCaseTaxonomy() {
-  const pEl = document.getElementById('case-primary'), sEl = document.getElementById('case-secondary');
-  const tax = window.NYAYA_CASE_TAXONOMY || {};
-  pEl.innerHTML = Object.keys(tax).map(k => `<option value="${esc(k)}">${esc(k)}</option>`).join('');
-  const syncSub = () => {
-    const item = tax[pEl.value] || { sub: [], law: '', type: '' };
-    if (!sEl.value || !item.sub.includes(sEl.value)) sEl.innerHTML = item.sub.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('');
-    document.getElementById('legal-suggest-type').textContent = `Case Type: ${item.type} (${sEl.value || pEl.value})`;
-    document.getElementById('legal-suggest-law').textContent = `Applicable Acts & Law: ${item.law}`;
-    updateLivePreview();
-  };
-  pEl.onchange = () => { sEl.innerHTML = (tax[pEl.value]?.sub || []).map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join(''); syncSub(); };
-  sEl.onchange = syncSub;
-  syncSub();
-}
+    async function loadCloud() {
+      const r = await fetch('/api/app-data?t=' + Date.now());
+      const d = await r.json();
+      if (d && d.payload) db = d.payload;
+    }
 
-function showWelcome() {
-  ['win-auth', 'win-client', 'win-advisor'].forEach(id => document.getElementById(id).classList.add('hidden'));
-  document.getElementById('win-welcome').classList.remove('hidden');
-  document.getElementById('btn-logout').classList.add('hidden');
-  document.getElementById('hdr-badge').classList.add('hidden');
-}
+    async function syncCloud(partial) {
+      const r = await fetch('/api/sync-mutation', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(partial) });
+      if (!r.ok) throw new Error('Cloud sync failed');
+      await loadCloud();
+    }
 
-function enterAuthFromWelcome(role) {
-  document.getElementById('win-welcome').classList.add('hidden');
-  document.getElementById('win-auth').classList.remove('hidden');
-  setAuthRole(role);
-}
+    function curUser() { return (db.users || []).find(u => u.id === session.userId) || null; }
 
-function setAuthRole(role) {
-  session.authRole = role;
-  const isAdv = role === 'advisor';
-  document.getElementById('role-tab-client').className = !isAdv ? 'role-btn py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#08519C] text-white' : 'role-btn py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-transparent text-[#08306B]';
-  document.getElementById('role-tab-advisor').className = isAdv ? 'role-btn py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#08519C] text-white' : 'role-btn py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-transparent text-[#08306B]';
-  document.getElementById('auth-signin-title').textContent = isAdv ? 'Sign In as Advisor / Legal Firm' : 'Sign In as Requestee';
-  document.getElementById('reg-role').value = isAdv ? 'advisor' : 'client';
-  toggleRegAdvisorFields();
-}
+    function showAuth() {
+      ['win-client', 'win-advisor'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      document.getElementById('win-auth').classList.remove('hidden');
+      document.getElementById('btn-logout').classList.add('hidden');
+      document.getElementById('hdr-badge').textContent = 'Not Signed In'; document.getElementById('hdr-badge').classList.remove('hidden');
+    }
 
-function toggleRegAdvisorFields() {
-  const v = document.getElementById('reg-role').value;
-  document.getElementById('reg-advisor-fields').classList.toggle('hidden', v === 'client');
-  document.getElementById('reg-firm-parent').classList.toggle('hidden', v !== 'advisor');
-}
+    function enterPortal(u) {
+      session.userId = u.id;
+      sessionStorage.setItem('nyaya_uid', u.id);
+      document.getElementById('win-auth').classList.add('hidden');
+      document.getElementById('btn-logout').classList.remove('hidden');
+      const hb = document.getElementById('hdr-badge');
+      hb.textContent = u.role === 'advisor' ? 'Advisor' : 'Client';
+      hb.classList.remove('hidden');
 
-function enterPortal(u) {
-  session.userId = u.id;
-  sessionStorage.setItem('nyaya_uid', u.id);
-  ['win-welcome', 'win-auth'].forEach(id => document.getElementById(id).classList.add('hidden'));
-  document.getElementById('btn-logout').classList.remove('hidden');
-  const hb = document.getElementById('hdr-badge');
-  hb.textContent = u.role === 'firm' ? 'Legal Firm' : u.role === 'advisor' ? 'Advisor' : 'Requestee';
-  hb.classList.remove('hidden');
-  if (u.role === 'client') {
-    document.getElementById('win-advisor').classList.add('hidden');
-    document.getElementById('win-client').classList.remove('hidden');
-    document.getElementById('cli-avatar').textContent = initials(u.name);
-    document.getElementById('cli-welcome').textContent = `Welcome, ${u.name} (Requestee)`;
-    document.getElementById('case-pin').value = u.pin || '';
-    populateStatesAndCities('case-state', 'case-city', u.state, u.city);
-    updateLivePreview(); renderClientDash(); switchClientTab('new-case');
-  } else {
-    document.getElementById('win-client').classList.add('hidden');
-    document.getElementById('win-advisor').classList.remove('hidden');
-    document.getElementById('adv-avatar').textContent = initials(u.name);
-    document.getElementById('adv-welcome').textContent = `Welcome, ${u.name} (${u.role === 'firm' ? 'Legal Organisation' : 'Independent Advisor'})`;
-    renderAdvisorDash(); switchAdvisorTab('requests');
-  }
-}
+      if (u.role === 'client') {
+        document.getElementById('win-advisor').classList.add('hidden');
+        document.getElementById('win-client').classList.remove('hidden');
+        document.getElementById('cli-avatar').textContent = initials(u.name);
+        document.getElementById('cli-welcome').textContent = `Welcome, ${u.name} (Client)`;
+        document.getElementById('case-pin').value = u.pin || '';
+        document.getElementById('case-city').value = u.city || '';
+        document.getElementById('case-state').value = u.state || '';
+        updateLivePreview();
+        renderClientDash();
+        switchClientTab('new-case');
+      } else {
+        document.getElementById('win-client').classList.add('hidden');
+        document.getElementById('win-advisor').classList.remove('hidden');
+        document.getElementById('adv-avatar').textContent = initials(u.name);
+        document.getElementById('adv-welcome').textContent = `Welcome, ${u.name} (Legal Advisor)`;
+        renderAdvisorDash();
+        switchAdvisorTab('requests');
+      }
+    }
 
-function switchClientTab(tab) {
-  ['new-case', 'my-cases', 'notifications', 'mail', 'profile'].forEach(t => document.getElementById('cview-' + t).classList.toggle('hidden', t !== tab));
-  document.querySelectorAll('.ctab').forEach(b => {
-    const a = b.getAttribute('data-ctab') === tab;
-    b.className = a ? 'ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-[#08519C] text-white' : 'ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-[#DEEBF7] text-[#08306B]';
-  });
-  if (tab === 'my-cases') renderClientDash();
-  if (tab === 'notifications') renderClientNotifs();
-  if (tab === 'mail') renderMail('client');
-  if (tab === 'profile') renderClientProfile();
-}
+    function switchClientTab(tab) {
+      ['new-case', 'my-cases', 'mail', 'profile'].forEach(t => document.getElementById('cview-' + t).classList.toggle('hidden', t !== tab));
+      document.querySelectorAll('.ctab').forEach(b => {
+        const a = b.getAttribute('data-ctab') === tab;
+        b.className = a ? 'ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-black text-white' : 'ctab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-800';
+      });
+      if (tab === 'my-cases') renderClientDash();
+      if (tab === 'mail') renderMail('client');
+      if (tab === 'profile') renderClientProfile();
+    }
 
-function switchAdvisorTab(tab) {
-  ['requests', 'notifications', 'profile', 'mail'].forEach(t => document.getElementById('aview-' + t).classList.toggle('hidden', t !== tab));
-  document.querySelectorAll('.atab').forEach(b => {
-    const a = b.getAttribute('data-atab') === tab;
-    b.className = a ? 'atab px-3 py-1.5 rounded-xl text-xs font-bold bg-[#08519C] text-white' : 'atab px-3 py-1.5 rounded-xl text-xs font-bold bg-[#DEEBF7] text-[#08306B]';
-  });
-  if (tab === 'requests' || tab === 'notifications') renderAdvisorDash();
-  if (tab === 'profile') populateAdvisorForm();
-  if (tab === 'mail') renderMail('advisor');
-}
+    function switchAdvisorTab(tab) {
+      ['requests', 'profile', 'mail'].forEach(t => document.getElementById('aview-' + t).classList.toggle('hidden', t !== tab));
+      document.querySelectorAll('.atab').forEach(b => {
+        const a = b.getAttribute('data-atab') === tab;
+        b.className = a ? 'atab px-3 py-1.5 rounded-xl text-xs font-bold bg-black text-white' : 'atab px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-800';
+      });
+      if (tab === 'requests') renderAdvisorDash();
+      if (tab === 'profile') populateAdvisorForm();
+      if (tab === 'mail') renderMail('advisor');
+    }
 
-function updateLivePreview() {
-  const u = curUser(); if (!u) return;
-  const st = (document.getElementById('case-state').value || u.state || 'MP').slice(0,2).toUpperCase();
-  const ct = (document.getElementById('case-primary').value || 'CIV').slice(0,3).toUpperCase();
-  const pin = document.getElementById('case-pin').value || u.pin || '482001';
-  document.getElementById('live-case-preview').textContent = `Preview: ${st}/${ct}/${pin}/${String((db.cases||[]).length + 1).padStart(3,'0')}`;
-}
+    function updateLivePreview() {
+      const u = curUser(); if (!u) return;
+      const st = (document.getElementById('case-state').value || u.state || 'MP').slice(0,2).toUpperCase();
+      const ct = (document.getElementById('case-type').value || 'CIV').slice(0,3).toUpperCase();
+      const pin = document.getElementById('case-pin').value || u.pin || '482001';
+      document.getElementById('live-case-preview').textContent = `Preview: ${st}/${ct}/${pin}/${String((db.cases||[]).length + 1).padStart(3,'0')}`;
+    }
 
-</script>
+    function renderClientDash() {
+      const u = curUser(); if (!u) return;
+      const myCases = (db.cases || []).filter(c => c.clientId === u.id);
+      const unlockedTotal = myCases.reduce((s, c) => s + (c.unlockedAdvisors || []).length, 0);
+      document.getElementById('cli-stat-cases').textContent = myCases.length;
+      document.getElementById('cli-stat-unlocked').textContent = unlockedTotal;
+      document.getElementById('cli-stat-credits').textContent = Number(u.contactCreditsRemaining || 0);
+
+      const listEl = document.getElementById('cli-cases-list');
+      if (myCases.length === 0) {
+        listEl.innerHTML = '<div class="bg-white rounded-2xl border border-slate-200 p-6 text-center text-xs text-slate-500">No cases filed yet. Use "New Case" to submit your first case free.</div>';
+        document.getElementById('cli-advisors-panel').classList.add('hidden');
+        return;
+      }
+      if (!session.activeCaseId || !myCases.some(c => c.id === session.activeCaseId)) session.activeCaseId = myCases[0].id;
+
+      listEl.innerHTML = myCases.map(c => `
+        <div class="bg-white rounded-2xl border ${c.id === session.activeCaseId ? 'border-black ring-1 ring-black' : 'border-slate-200'} p-4 flex flex-wrap items-center justify-between gap-3">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded bg-black text-white text-[11px] font-mono font-bold">${esc(c.caseNumber)}</span><span class="text-xs font-semibold text-slate-500">${esc(c.caseType)} • ${esc(c.city)} (${esc(c.pin)})</span></div>
+            <p class="text-sm font-bold">${esc(c.subject)}</p>
+            <p class="text-xs text-slate-600">${esc(c.summary)}</p>
+          </div>
+          <button type="button" data-select-case="${esc(c.id)}" class="px-3.5 py-2 rounded-xl text-xs font-bold ${c.id === session.activeCaseId ? 'bg-black text-white' : 'bg-slate-100 text-slate-800'}">View Ranked Advisors</button>
+        </div>`).join('');
+
+      const activeCase = myCases.find(c => c.id === session.activeCaseId);
+      if (activeCase) renderAdvisorTable(activeCase);
+    }
+
+    function renderAdvisorTable(c) {
+      const panel = document.getElementById('cli-advisors-panel');
+      panel.classList.remove('hidden');
+      document.getElementById('cw-case-num').textContent = c.caseNumber;
+      const scope = document.getElementById('cw-scope-filter').value;
+      const kw = document.getElementById('cw-spec-filter').value.trim().toLowerCase();
+
+      let advs = (db.users || []).filter(u => u.role === 'advisor');
+      let filtered = advs.filter(a => {
+        if (scope === 'pin') return a.pin === c.pin;
+        if (scope === 'city') return (a.city || '').toLowerCase() === (c.city || '').toLowerCase();
+        if (scope === 'state') return (a.state || '').toLowerCase() === (c.state || '').toLowerCase();
+        return true;
+      });
+      if (filtered.length === 0 && scope !== 'all') {
+        filtered = advs;
+        document.getElementById('cw-scope-note').textContent = `No exact ${scope.toUpperCase()} match — showing all ${filtered.length} advisors.`;
+      } else {
+        document.getElementById('cw-scope-note').textContent = `Showing ${filtered.length} advisor(s).`;
+      }
+      if (kw) filtered = filtered.filter(a => (a.name || '').toLowerCase().includes(kw) || (a.specialisations || []).join(' ').toLowerCase().includes(kw));
+      filtered.sort((a, b) => (Number(b.yearsOfExperience) || 0) - (Number(a.yearsOfExperience) || 0));
+
+      const tbody = document.getElementById('cw-advisors-tbody');
+      if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">No advisors registered yet.</td></tr>'; return; }
+
+      tbody.innerHTML = filtered.map((a, idx) => {
+        const unlocked = (c.unlockedAdvisors || []).includes(a.id);
+        return `<tr>
+          <td class="p-2 font-bold text-blue-800 whitespace-nowrap">#${idx+1} (${esc(a.yearsOfExperience || 0)} yrs)</td>
+          <td class="p-2"><div class="font-bold">${esc(a.name)}</div><div class="text-[11px] font-mono text-slate-500">Licence: ${esc(a.licenceNumber || 'Verified')}</div></td>
+          <td class="p-2">${esc((a.specialisations || []).join(', ') || 'General Practice')}</td>
+          <td class="p-2 whitespace-nowrap">${esc(a.city || '')} • ${esc(a.pin || '')}</td>
+          <td class="p-2 whitespace-nowrap">₹${esc(a.feeMin || 500)}–₹${esc(a.feeMax || 5000)}</td>
+          <td class="p-2">${unlocked
+            ? `<div class="text-xs"><span class="font-bold text-emerald-700 block">${esc(a.phone)}</span><span class="text-slate-600">${esc(a.email)}</span></div>`
+            : `<button type="button" data-reach-advisor="${esc(a.id)}" class="px-3 py-1.5 rounded-lg bg-black text-white font-bold hover:bg-zinc-800 whitespace-nowrap">View Contact &amp; Notify</button>`}
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function renderClientProfile() {
+      const u = curUser(); if (!u) return;
+      const myCases = (db.cases || []).filter(c => c.clientId === u.id);
+      const freeLeft = Math.max(0, 1 - myCases.length);
+      document.getElementById('cview-profile').innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div><h3 class="text-base font-bold">${esc(u.name)}</h3><p class="text-xs text-slate-500">${esc(u.email)} • ${esc(u.phone)} • ${esc(u.city)}, ${esc(u.state)} (${esc(u.pin)})</p></div>
+          <button type="button" data-open-upi="client" class="px-4 py-2 rounded-xl bg-black text-white text-xs font-bold">Upgrade / Buy Credits</button>
+        </div>
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-1">
+          <p class="font-bold">Free Starter: ${freeLeft} / 1 free case left • Paid Credits: ${Number(u.contactCreditsRemaining || 0)}</p>
+          ${u.subscriptionPlanName ? `<p class="text-emerald-700 font-semibold">Active Plan: ${esc(u.subscriptionPlanName)}</p>` : ''}
+        </div>`;
+    }
+
+    function advUnlockedIds(aid) {
+      const a = (db.users || []).find(u => u.id === aid);
+      const fromUser = Array.isArray(a?.unlockedContactCaseIds) ? a.unlockedContactCaseIds : [];
+      const fromCases = (db.cases || []).filter(c => (c.unlockedByAdvisors || []).includes(aid)).map(c => c.id);
+      return Array.from(new Set([...fromUser, ...fromCases]));
+    }
+
+    function computeProfilePct(a) {
+      const checks = [a.name, a.licenceNumber, a.college, a.university, a.passingYear, Number(a.yearsOfExperience) > 0, a.bio, (a.specialisations || []).length > 0];
+      return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+    }
+
+    function renderAdvisorDash() {
+      const a = curUser(); if (!a) return;
+      const reqs = (db.notifications || []).filter(n => n.advisorId === a.id);
+      const unlockedIds = advUnlockedIds(a.id);
+      const freeUsed = Math.min(3, unlockedIds.length);
+      const freeLeft = Math.max(0, 3 - freeUsed);
+      const paidCredits = Number(a.contactCreditsRemaining || 0);
+      const totalLeft = freeLeft + paidCredits;
+
+      document.getElementById('adv-stat-reqs').textContent = reqs.length;
+      document.getElementById('adv-stat-free').textContent = paidCredits > 0 ? `${freeLeft}/3 + ${paidCredits} paid` : `${freeLeft} / 3`;
+      const pct = computeProfilePct(a);
+      document.getElementById('adv-comp-pct').textContent = pct + '%';
+      document.getElementById('adv-comp-bar').style.width = pct + '%';
+
+      document.getElementById('advisor-sub-banner').innerHTML = totalLeft > 0
+        ? `<span><strong>Starter / Active Credits:</strong> ${freeLeft} of 3 free + ${paidCredits} paid unlocks left.</span><button type="button" data-open-upi="advisor" class="px-3 py-1 rounded-lg bg-black text-white font-bold">Buy More Credits</button>`
+        : `<span><strong>Free Allowance Used (3/3):</strong> Subscribe via UPI to unlock more client contacts.</span><button type="button" data-open-upi="advisor" class="px-3 py-1 rounded-lg bg-black text-white font-bold">Upgrade Plan</button>`;
+
+      const reqWrap = document.getElementById('advisor-notifications-list');
+      reqWrap.innerHTML = reqs.length === 0
+        ? '<p class="text-xs text-slate-500">No direct client reach requests yet. Check the Open Case Pool below.</p>'
+        : reqs.map(n => {
+            const c = (db.cases || []).find(x => x.id === n.caseId);
+            const cli = (db.users || []).find(u => u.id === n.clientId);
+            const unl = unlockedIds.includes(n.caseId);
+            return `<div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div><span class="font-mono font-bold bg-black text-white px-2 py-0.5 rounded">${esc(n.caseNumber)}</span> <strong class="ml-1">${c ? esc(c.subject) : 'Case'}</strong>
+              <p class="text-slate-600 mt-1">${c ? esc(c.summary) : ''}</p>
+              ${unl && cli ? `<p class="mt-1 font-bold text-emerald-700">Client: ${esc(cli.name)} • ${esc(cli.phone)} • ${esc(cli.email)}</p>` : ''}</div>
+              ${unl ? `<button type="button" data-goto-mail="${esc(n.clientId)}" class="px-3 py-1.5 rounded-lg bg-black text-white font-bold">Send Mail</button>`
+                   : `<button type="button" data-unlock-case="${esc(n.caseId)}" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold">Unlock Contact</button>`}
+            </div>`;
+          }).join('');
+
+      const kw = (document.getElementById('adv-pool-filter').value || '').trim().toLowerCase();
+      let pool = (db.cases || []).slice();
+      if (kw) pool = pool.filter(c => [c.city, c.state, c.pin, c.caseType, c.subject, c.summary].join(' ').toLowerCase().includes(kw));
+      const poolWrap = document.getElementById('advisor-case-pool-list');
+      poolWrap.innerHTML = pool.length === 0
+        ? '<p class="text-xs text-slate-500">No open cases in the pool yet.</p>'
+        : pool.map(c => {
+            const cli = (db.users || []).find(u => u.id === c.clientId);
+            const unl = unlockedIds.includes(c.id);
+            return `<div class="p-3.5 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div><span class="font-mono font-bold bg-slate-900 text-white px-2 py-0.5 rounded">${esc(c.caseNumber)}</span> <span class="ml-1 font-semibold text-slate-600">${esc(c.caseType)} • ${esc(c.city)} (${esc(c.pin)})</span>
+              <p class="font-bold text-sm mt-1">${esc(c.subject)}</p><p class="text-slate-600">${esc(c.summary)}</p>
+              ${unl && cli ? `<p class="mt-1 font-bold text-emerald-700">Client: ${esc(cli.name)} • ${esc(cli.phone)} • ${esc(cli.email)}</p>` : ''}</div>
+              ${unl ? `<button type="button" data-goto-mail="${esc(c.clientId)}" class="px-3 py-1.5 rounded-lg bg-black text-white font-bold">Send Mail</button>`
+                   : `<button type="button" data-unlock-case="${esc(c.id)}" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold">Unlock Contact (${totalLeft > 0 ? totalLeft + ' left' : 'Subscribe'})</button>`}
+            </div>`;
+          }).join('');
+    }
+
+    function populateAdvisorForm() {
+      const a = curUser(); if (!a) return;
+      document.getElementById('ap-licence').value = a.licenceNumber || '';
+      document.getElementById('ap-college').value = a.college || '';
+      document.getElementById('ap-university').value = a.university || '';
+      document.getElementById('ap-year').value = a.passingYear || '';
+      document.getElementById('ap-exp').value = a.yearsOfExperience || '';
+      document.getElementById('ap-spec').value = (a.specialisations || []).join(', ');
+      document.getElementById('ap-fmin').value = a.feeMin || '';
+      document.getElementById('ap-fmax').value = a.feeMax || '';
+      document.getElementById('ap-city').value = a.city || '';
+      document.getElementById('ap-bio').value = a.bio || '';
+    }
+
+    function renderMail(role) {
+      const u = curUser(); if (!u) return;
+      const peers = (db.users || []).filter(x => x.id !== u.id && x.role !== u.role);
+      const sel = document.getElementById(role === 'client' ? 'cli-mail-to' : 'adv-mail-to');
+      sel.innerHTML = peers.map(p => `<option value="${esc(p.id)}">${esc(p.name)} (${esc(p.role)})</option>`).join('') || '<option value="">No recipients</option>';
+      const msgs = (db.messages || []).filter(m => m.fromId === u.id || m.toId === u.id);
+      const list = document.getElementById(role === 'client' ? 'cli-mail-list' : 'adv-mail-list');
+      list.innerHTML = msgs.length === 0 ? '<p class="text-slate-500">No messages yet.</p>' : msgs.map(m => {
+        const from = (db.users || []).find(x => x.id === m.fromId)?.name || 'User';
+        return `<div class="p-2.5 rounded-xl border border-slate-200 ${m.fromId === u.id ? 'bg-slate-50' : 'bg-white'}"><strong>${esc(from)}:</strong> ${esc(m.body)}</div>`;
+      }).join('');
+    }
+
+    function openUpiModal(role) {
+      const rules = db.subscriptionRules || { client: [], advisor: [] };
+      const plans = (rules[role] || []).filter(p => p.enabled !== false);
+      document.getElementById('upi-pay-box').classList.add('hidden');
+      document.getElementById('upi-plans-list').innerHTML = plans.map((p, i) => `
+        <button type="button" data-pick-plan="${role}:${i}" class="w-full text-left p-3 rounded-xl border border-slate-200 hover:border-black flex items-center justify-between">
+          <div><div class="font-bold">${esc(p.name)}</div><div class="text-slate-500">${esc(p.description || '')}</div></div>
+          <span class="font-black text-sm">₹${esc(p.priceInr)}</span>
+        </button>`).join('');
+      document.getElementById('upi-modal').classList.remove('hidden');
+    }
+
+    // EVENT LISTENERS
+    document.getElementById('reg-role').addEventListener('change', e => document.getElementById('reg-advisor-fields').classList.toggle('hidden', e.target.value !== 'advisor'));
+    ['case-type','case-pin','case-state'].forEach(id => document.getElementById(id).addEventListener('input', updateLivePreview));
+    document.querySelectorAll('.ctab').forEach(b => b.addEventListener('click', () => switchClientTab(b.getAttribute('data-ctab'))));
+    document.querySelectorAll('.atab').forEach(b => b.addEventListener('click', () => switchAdvisorTab(b.getAttribute('data-atab'))));
+    document.getElementById('cw-scope-filter').addEventListener('change', renderClientDash);
+    document.getElementById('cw-spec-filter').addEventListener('input', renderClientDash);
+    document.getElementById('adv-pool-filter').addEventListener('input', renderAdvisorDash);
+    document.getElementById('btn-close-upi').addEventListener('click', () => document.getElementById('upi-modal').classList.add('hidden'));
+    document.getElementById('btn-logout').addEventListener('click', () => { sessionStorage.removeItem('nyaya_uid'); session.userId = null; showAuth(); });
+
+    document.getElementById('btn-gps').addEventListener('click', () => {
+      if (!navigator.geolocation) return toast('GPS not supported.');
+      navigator.geolocation.getCurrentPosition(pos => {
+        session.gps = { lat: pos.coords.latitude.toFixed(5), lng: pos.coords.longitude.toFixed(5) };
+        document.getElementById('gps-status').textContent = `GPS: ${session.gps.lat}, ${session.gps.lng}`;
+      }, () => toast('Location permission denied.'));
+    });
+
+    document.getElementById('form-forgot').addEventListener('submit', async e => {
+      e.preventDefault();
+      await loadCloud();
+      const em = document.getElementById('fp-email').value.trim().toLowerCase();
+      const ph = document.getElementById('fp-phone').value.trim();
+      const np = document.getElementById('fp-newpass').value;
+      const msg = document.getElementById('fp-msg');
+      const u = (db.users || []).find(x => (x.email || '').toLowerCase() === em && (x.phone || '').trim() === ph);
+      if (!u) { msg.textContent = 'Email and phone do not match any account.'; msg.className = 'text-xs font-semibold text-rose-600'; return; }
+      await syncCloud({ users: [{ ...u, password: np }] });
+      msg.textContent = 'Password updated! You can now sign in above.'; msg.className = 'text-xs font-semibold text-emerald-700';
+      e.target.reset();
+    });
+
+    document.getElementById('form-login').addEventListener('submit', async e => {
+      e.preventDefault();
+      await loadCloud();
+      const em = document.getElementById('login-email').value.trim().toLowerCase();
+      const pw = document.getElementById('login-pass').value;
+      const u = (db.users || []).find(x => ((x.email || '').toLowerCase() === em || (x.phone || '').trim() === em) && x.password === pw);
+      const err = document.getElementById('login-err');
+      if (!u) { err.textContent = 'Invalid email or password.'; err.classList.remove('hidden'); return; }
+      if (u.role !== session.authRole) {
+        err.textContent = `This account is registered as a ${u.role === 'advisor' ? 'Legal Advisor' : 'Requestee'}. Please switch tabs above.`;
+        err.classList.remove('hidden');
+        return;
+      }
+      err.classList.add('hidden');
+      enterPortal(u);
+    });
+
+    document.getElementById('form-register').addEventListener('submit', async e => {
+      e.preventDefault();
+      await loadCloud();
+      const email = document.getElementById('reg-email').value.trim().toLowerCase();
+      const err = document.getElementById('reg-err');
+      if ((db.users || []).some(u => (u.email || '').toLowerCase() === email)) { err.textContent = 'Email already registered.'; err.classList.remove('hidden'); return; }
+      err.classList.add('hidden');
+      const role = document.getElementById('reg-role').value;
+      const u = {
+        id: 'u_' + Date.now(), role,
+        name: document.getElementById('reg-name').value.trim(), email,
+        phone: document.getElementById('reg-phone').value.trim(),
+        password: document.getElementById('reg-pass').value,
+        pin: document.getElementById('reg-pin').value.trim(),
+        city: document.getElementById('reg-city').value.trim(),
+        state: document.getElementById('reg-state').value.trim(),
+        licenceNumber: document.getElementById('reg-licence').value.trim(),
+        yearsOfExperience: Number(document.getElementById('reg-exp').value || 0),
+        specialisations: document.getElementById('reg-spec').value.split(',').map(s => s.trim()).filter(Boolean),
+        advisorVerified: true, contactCreditsRemaining: 0, unlockedContactCaseIds: [],
+        createdAt: new Date().toISOString()
+      };
+      await syncCloud({ users: [u] });
+      toast('Account created & synced to cloud!');
+      enterPortal(u);
+    });
+
+    document.getElementById('form-new-case').addEventListener('submit', async e => {
+      e.preventDefault();
+      const u = curUser(); if (!u) return;
+      const st = document.getElementById('case-state').value.trim();
+      const ct = document.getElementById('case-type').value;
+      const pin = document.getElementById('case-pin').value.trim();
+      const c = {
+        id: 'c_' + Date.now(), clientId: u.id, caseType: ct, pin,
+        city: document.getElementById('case-city').value.trim(), state: st,
+        subject: document.getElementById('case-subject').value.trim(),
+        summary: document.getElementById('case-summary').value.trim(),
+        lat: session.gps?.lat || '', lng: session.gps?.lng || '',
+        caseNumber: `${st.slice(0,2).toUpperCase()}/${ct.slice(0,3).toUpperCase()}/${pin}/${String((db.cases||[]).length + 1).padStart(3,'0')}`,
+        unlockedAdvisors: [], unlockedByAdvisors: [], createdAt: new Date().toISOString()
+      };
+      await syncCloud({ cases: [c] });
+      session.activeCaseId = c.id;
+      e.target.reset();
+      toast('Case submitted! Select an advisor below.');
+      switchClientTab('my-cases');
+    });
+
+    document.getElementById('form-adv-profile').addEventListener('submit', async e => {
+      e.preventDefault();
+      const a = curUser(); if (!a) return;
+      const updated = {
+        ...a,
+        licenceNumber: document.getElementById('ap-licence').value.trim(),
+        college: document.getElementById('ap-college').value.trim(),
+        university: document.getElementById('ap-university').value.trim(),
+        passingYear: document.getElementById('ap-year').value.trim(),
+        yearsOfExperience: Number(document.getElementById('ap-exp').value || 0),
+        specialisations: document.getElementById('ap-spec').value.split(',').map(s => s.trim()).filter(Boolean),
+        feeMin: Number(document.getElementById('ap-fmin').value || 500),
+        feeMax: Number(document.getElementById('ap-fmax').value || 5000),
+        city: document.getElementById('ap-city').value.trim(),
+        bio: document.getElementById('ap-bio').value.trim()
+      };
+      await syncCloud({ users: [updated] });
+      renderAdvisorDash();
+      toast('Profile saved & completeness updated!');
+    });
+
+    document.getElementById('form-cli-mail').addEventListener('submit', async e => {
+      e.preventDefault();
+      const u = curUser(); const toId = document.getElementById('cli-mail-to').value;
+      if (!u || !toId) return;
+      await syncCloud({ messages: [{ id: 'm_' + Date.now(), fromId: u.id, toId, body: document.getElementById('cli-mail-body').value.trim(), createdAt: new Date().toISOString() }] });
+      document.getElementById('cli-mail-body').value = '';
+      renderMail('client');
+    });
+
+    document.getElementById('form-adv-mail').addEventListener('submit', async e => {
+      e.preventDefault();
+      const u = curUser(); const toId = document.getElementById('adv-mail-to').value;
+      if (!u || !toId) return;
+      await syncCloud({ messages: [{ id: 'm_' + Date.now(), fromId: u.id, toId, body: document.getElementById('adv-mail-body').value.trim(), createdAt: new Date().toISOString() }] });
+      document.getElementById('adv-mail-body').value = '';
+      renderMail('advisor');
+    });
+
+    document.getElementById('form-utr').addEventListener('submit', async e => {
+      e.preventDefault();
+      const u = curUser(), pl = session.selectedPlan; if (!u || !pl) return;
+      const pay = {
+        id: 'pay_' + Date.now(), userId: u.id, userName: u.name, role: u.role,
+        planId: pl.id, planName: pl.name, amountInr: pl.priceInr, credits: pl.credits, durationDays: pl.durationDays || 0,
+        utr: document.getElementById('utr-input').value.trim(), status: 'pending', createdAt: new Date().toISOString()
+      };
+      await syncCloud({ payments: [pay] });
+      document.getElementById('upi-modal').classList.add('hidden');
+      document.getElementById('utr-input').value = '';
+      toast('UTR submitted! Admin verification will credit your plan.');
+    });
+
+    document.addEventListener('click', async e => {
+      const sc = e.target.closest('[data-select-case]');
+      if (sc) { session.activeCaseId = sc.getAttribute('data-select-case'); renderClientDash(); }
+
+      const ra = e.target.closest('[data-reach-advisor]');
+      if (ra) {
+        const u = curUser(), aid = ra.getAttribute('data-reach-advisor');
+        const c = (db.cases || []).find(x => x.id === session.activeCaseId);
+        if (!u || !c) return;
+        const myCases = (db.cases || []).filter(x => x.clientId === u.id);
+        const isFirstFree = myCases[0]?.id === c.id && (c.unlockedAdvisors || []).length < 3;
+        if (!isFirstFree && Number(u.contactCreditsRemaining || 0) <= 0) { openUpiModal('client'); return; }
+        const updCase = { ...c, unlockedAdvisors: Array.from(new Set([...(c.unlockedAdvisors || []), aid])) };
+        const updUser = isFirstFree ? u : { ...u, contactCreditsRemaining: Number(u.contactCreditsRemaining) - 1 };
+        const notif = { id: 'n_' + Date.now(), advisorId: aid, clientId: u.id, caseId: c.id, caseNumber: c.caseNumber, createdAt: new Date().toISOString() };
+        await syncCloud({ cases: [updCase], users: [updUser], notifications: [notif] });
+        toast('Advisor contact unlocked & notification sent!');
+        renderClientDash();
+      }
+
+      const uc = e.target.closest('[data-unlock-case]');
+      if (uc) {
+        const a = curUser(), cid = uc.getAttribute('data-unlock-case');
+        const c = (db.cases || []).find(x => x.id === cid);
+        if (!a || !c) return;
+        const unlocked = advUnlockedIds(a.id);
+        const freeLeft = Math.max(0, 3 - unlocked.length);
+        if (freeLeft <= 0 && Number(a.contactCreditsRemaining || 0) <= 0) { openUpiModal('advisor'); return; }
+        const updAdv = { ...a, unlockedContactCaseIds: Array.from(new Set([...unlocked, cid])), contactCreditsRemaining: freeLeft > 0 ? Number(a.contactCreditsRemaining || 0) : Number(a.contactCreditsRemaining) - 1 };
+        const updCase = { ...c, unlockedByAdvisors: Array.from(new Set([...(c.unlockedByAdvisors || []), a.id])) };
+        await syncCloud({ users: [updAdv], cases: [updCase] });
+        toast('Client contact unlocked!');
+        renderAdvisorDash();
+      }
+
+      const ou = e.target.closest('[data-open-upi]');
+      if (ou) openUpiModal(ou.getAttribute('data-open-upi'));
+
+      const pp = e.target.closest('[data-pick-plan]');
+      if (pp) {
+        const [role, idx] = pp.getAttribute('data-pick-plan').split(':');
+        const pl = (db.subscriptionRules?.[role] || [])[Number(idx)];
+        if (!pl) return;
+        session.selectedPlan = pl;
+        const vpa = db.upiVpa || 'nyayasetu@upi', name = db.upiName || 'NyayaSetu';
+        const upiUrl = `upi://pay?pa=${encodeURIComponent(vpa)}&pn=${encodeURIComponent(name)}&am=${pl.priceInr}&cu=INR&tn=${encodeURIComponent(pl.name)}`;
+        document.getElementById('upi-amt').textContent = pl.priceInr;
+        document.getElementById('upi-vpa-lbl').textContent = vpa;
+        document.getElementById('upi-intent-link').href = upiUrl;
+        document.getElementById('upi-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+        document.getElementById('upi-pay-box').classList.remove('hidden');
+      }
+
+      const gm = e.target.closest('[data-goto-mail]');
+      if (gm) { switchAdvisorTab('mail'); document.getElementById('adv-mail-to').value = gm.getAttribute('data-goto-mail'); }
+    });
+
+    (async () => {
+      await loadCloud();
+      const u = curUser();
+      if (u) enterPortal(u); else showAuth();
+    })();
+  </script>
 </body>
 </html>
