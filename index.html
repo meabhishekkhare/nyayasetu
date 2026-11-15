@@ -2194,6 +2194,11 @@
       document.getElementById('btn-logout').addEventListener('click', () => {
         session.userId = null;
         session.adminAuthed = false;
+        ['form-login', 'form-register', 'form-forgot'].forEach(fid => {
+          const el = document.getElementById(fid);
+          if (el && typeof el.reset === 'function') el.reset();
+        });
+        if (typeof setAuthTab === 'function') setAuthTab('login');
         showWindow('win-auth');
         toast('Signed out');
       });
