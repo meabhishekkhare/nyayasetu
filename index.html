@@ -20,7 +20,6 @@
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <a href="/admin.html" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-900 border border-zinc-700 hover:bg-zinc-800">Admin</a>
         <button id="btn-logout" type="button" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600 hover:bg-rose-500">Logout</button>
       </div>
     </div>
@@ -29,19 +28,34 @@
   <div id="toast" class="hidden fixed bottom-4 right-4 z-50 px-4 py-2.5 rounded-xl bg-black text-white text-xs font-bold shadow-lg"></div>
 
   <!-- AUTH WINDOW -->
-  <main id="win-auth" class="max-w-4xl mx-auto w-full px-4 py-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+  <main id="win-auth" class="max-w-xl mx-auto w-full px-4 py-8 space-y-5">
     <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-      <div><h2 class="text-lg font-bold">Sign In</h2><p class="text-xs text-slate-500">Online cloud account • Clients &amp; Legal Advisors</p></div>
+      <div><h2 class="text-lg font-bold">Sign In (Client or Legal Advisor)</h2><p class="text-xs text-slate-500">Online cloud account • Instant access to your portal</p></div>
       <form id="form-login" class="space-y-3 text-sm">
         <input id="login-email" type="email" required placeholder="Email address" class="w-full px-3 py-2 rounded-xl border border-slate-300" />
         <input id="login-pass" type="password" required placeholder="Password" class="w-full px-3 py-2 rounded-xl border border-slate-300" />
         <p id="login-err" class="text-xs text-rose-600 font-semibold hidden"></p>
         <button type="submit" class="w-full py-2.5 rounded-xl bg-black text-white font-bold hover:bg-zinc-800">Sign In</button>
       </form>
+      <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
+        <button type="button" onclick="document.getElementById('sec-register').classList.toggle('hidden');document.getElementById('sec-forgot').classList.add('hidden')" class="font-bold text-black underline">New user? Register below</button>
+        <button type="button" onclick="document.getElementById('sec-forgot').classList.toggle('hidden');document.getElementById('sec-register').classList.add('hidden')" class="font-semibold text-slate-600 underline">Forgot Password?</button>
+      </div>
     </section>
 
-    <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
-      <div><h2 class="text-lg font-bold">Create Account</h2><p class="text-xs text-slate-500">Instant cloud sync • No photo upload required</p></div>
+    <section id="sec-forgot" class="hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
+      <div><h3 class="text-base font-bold">Reset Password</h3><p class="text-xs text-slate-500">Verify your registered email &amp; phone to set a new password</p></div>
+      <form id="form-forgot" class="space-y-2.5 text-xs">
+        <input id="fp-email" type="email" required placeholder="Registered Email" class="w-full px-3 py-2 rounded-xl border border-slate-300" />
+        <input id="fp-phone" type="text" required placeholder="Registered Phone (10 digits)" class="w-full px-3 py-2 rounded-xl border border-slate-300" />
+        <input id="fp-newpass" type="password" required placeholder="New Password" class="w-full px-3 py-2 rounded-xl border border-slate-300" />
+        <p id="fp-msg" class="text-xs font-semibold hidden"></p>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800">Update Password</button>
+      </form>
+    </section>
+
+    <section id="sec-register" class="hidden bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-4">
+      <div><h2 class="text-lg font-bold">Create Account</h2><p class="text-xs text-slate-500">Instant cloud sync • Client or Legal Advisor</p></div>
       <form id="form-register" class="space-y-2.5 text-xs">
         <div class="grid grid-cols-2 gap-2">
           <select id="reg-role" class="px-3 py-2 rounded-xl border border-slate-300 font-semibold"><option value="client">Client (Seeking Advice)</option><option value="advisor">Legal Advisor</option></select>
@@ -499,7 +513,7 @@
 
     function openUpiModal(role) {
       const rules = db.subscriptionRules || { client: [], advisor: [] };
-      const plans = rules[role] || [];
+      const plans = (rules[role] || []).filter(p => p.enabled !== false);
       document.getElementById('upi-pay-box').classList.add('hidden');
       document.getElementById('upi-plans-list').innerHTML = plans.map((p, i) => `
         <button type="button" data-pick-plan="${role}:${i}" class="w-full text-left p-3 rounded-xl border border-slate-200 hover:border-black flex items-center justify-between">
@@ -526,6 +540,20 @@
         session.gps = { lat: pos.coords.latitude.toFixed(5), lng: pos.coords.longitude.toFixed(5) };
         document.getElementById('gps-status').textContent = `GPS: ${session.gps.lat}, ${session.gps.lng}`;
       }, () => toast('Location permission denied.'));
+    });
+
+    document.getElementById('form-forgot').addEventListener('submit', async e => {
+      e.preventDefault();
+      await loadCloud();
+      const em = document.getElementById('fp-email').value.trim().toLowerCase();
+      const ph = document.getElementById('fp-phone').value.trim();
+      const np = document.getElementById('fp-newpass').value;
+      const msg = document.getElementById('fp-msg');
+      const u = (db.users || []).find(x => (x.email || '').toLowerCase() === em && (x.phone || '').trim() === ph);
+      if (!u) { msg.textContent = 'Email and phone do not match any account.'; msg.className = 'text-xs font-semibold text-rose-600'; return; }
+      await syncCloud({ users: [{ ...u, password: np }] });
+      msg.textContent = 'Password updated! You can now sign in above.'; msg.className = 'text-xs font-semibold text-emerald-700';
+      e.target.reset();
     });
 
     document.getElementById('form-login').addEventListener('submit', async e => {

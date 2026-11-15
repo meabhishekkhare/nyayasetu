@@ -159,7 +159,14 @@
       const data = await res.json();
       if (data && data.payload) {
         db = { users: [], cases: [], messages: [], notifications: [], payments: [], ...data.payload };
-        if (!db.subscriptionRules) db.subscriptionRules = defaultRules();
+        const defR = defaultRules();
+        const curR = db.subscriptionRules || {};
+        db.subscriptionRules = {
+          upiVpa: curR.upiVpa || db.upiVpa || defR.upiVpa,
+          upiName: curR.upiName || db.upiName || defR.upiName,
+          client: Array.isArray(curR.client) && curR.client.length ? curR.client : defR.client,
+          advisor: Array.isArray(curR.advisor) && curR.advisor.length ? curR.advisor : defR.advisor
+        };
         if (!db.adminSecurity) db.adminSecurity = { adminId: 'admin@nyayasetu.in', passcode: 'admin123', pin: '2026' };
       }
     }
@@ -224,11 +231,16 @@
       document.getElementById('plans-editor').innerHTML = ['client', 'advisor'].map(role => `
         <div class="border border-slate-200 rounded-xl p-3 space-y-2">
           <h4 class="font-bold uppercase text-[11px] text-slate-500">${role} Plans</h4>
+          <div class="grid grid-cols-6 gap-1.5 text-[10px] font-bold text-slate-400 px-2">
+            <span class="col-span-2">Plan Name</span><span>Price (₹)</span><span>Credits</span><span>Days</span><span>Active</span>
+          </div>
           ${(r[role] || []).map((pl, idx) => `
-            <div class="grid grid-cols-4 gap-2 items-center bg-slate-50 p-2 rounded-lg">
+            <div class="grid grid-cols-6 gap-1.5 items-center bg-slate-50 p-2 rounded-lg">
               <input data-plan-role="${role}" data-plan-idx="${idx}" data-plan-field="name" value="${esc(pl.name)}" class="col-span-2 px-2 py-1 rounded border border-slate-300" />
-              <input data-plan-role="${role}" data-plan-idx="${idx}" data-plan-field="priceInr" type="number" value="${esc(pl.priceInr)}" class="px-2 py-1 rounded border border-slate-300" title="Price INR" />
-              <input data-plan-role="${role}" data-plan-idx="${idx}" data-plan-field="credits" type="number" value="${esc(pl.credits)}" class="px-2 py-1 rounded border border-slate-300" title="Credits" />
+              <input data-plan-role="${role}" data-plan-idx="${idx}" data-plan-field="priceInr" type="number" value="${esc(pl.priceInr)}" class="px-2 py-1 rounded border border-slate-300" />
+              <input data-plan-role="${role}" data-plan-idx="${idx}" data-plan-field="credits" type="number" value="${esc(pl.credits)}" class="px-2 py-1 rounded border border-slate-300" />
+              <input data-plan-role="${role}" data-plan-idx="${idx}" data-plan-field="durationDays" type="number" value="${esc(pl.durationDays || 0)}" class="px-2 py-1 rounded border border-slate-300" />
+              <label class="flex items-center justify-center"><input data-plan-role="${role}" data-plan-idx="${idx}" data-plan-field="enabled" type="checkbox" ${pl.enabled !== false ? 'checked' : ''} class="w-4 h-4" /></label>
             </div>`).join('')}
         </div>`).join('');
 
@@ -334,7 +346,11 @@
         const idx = Number(inp.getAttribute('data-plan-idx'));
         const field = inp.getAttribute('data-plan-field');
         const pl = db.subscriptionRules[role][idx];
-        if (pl) pl[field] = (field === 'priceInr' || field === 'credits') ? Number(inp.value) : inp.value.trim();
+        if (pl) {
+          if (field === 'enabled') pl.enabled = inp.checked;
+          else if (field === 'priceInr' || field === 'credits' || field === 'durationDays') pl[field] = Number(inp.value);
+          else pl[field] = inp.value.trim();
+        }
       });
       await fetch('/api/save-rules', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
