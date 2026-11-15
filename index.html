@@ -786,6 +786,39 @@
       if (gm) { switchAdvisorTab('mail'); document.getElementById('adv-mail-to').value = gm.getAttribute('data-goto-mail'); }
     });
 
+
+    const I18N = {
+      en: { who: 'Who are you?', sub: 'Choose Requestee to file a case & find advisors, or Legal Advisor to manage your verified practice.' },
+      hi: { who: 'आप कौन हैं?', sub: 'मामला दर्ज करने के लिए आवेदक चुनें, या अपनी प्रैक्टिस के लिए कानूनी सलाहकार चुनें।' },
+      mr: { who: 'तुम्ही कोण आहात?', sub: 'प्रकरण नोंदवण्यासाठी अर्जदार निवडा, किंवा तुमच्या सेवेसाठी कायदेशीर सल्लागार निवडा.' },
+      bn: { who: 'আপনি কে?', sub: 'মামলা দায়ের করতে আবেদনকারী বেছে নিন, অথবা আইনি পরামর্শদাতা নির্বাচন করুন।' },
+      ta: { who: 'நீங்கள் யார்?', sub: 'வழக்கு பதிவு செய்ய விண்ணப்பதாரர் அல்லது சட்ட ஆலோசகரைத் தேர்ந்தெடுக்கவும்.' },
+      te: { who: 'మీరు ఎవరు?', sub: 'కేసు నమోదు చేయడానికి క్లయింట్ లేదా న్యాయ సలహాదారుని ఎంచుకోండి.' },
+      gu: { who: 'તમે કોણ છો?', sub: 'કેસ નોંધવા માટે અરજદાર પસંદ કરો અથવા કાનૂની સલાહકાર પસંદ કરો.' },
+      kn: { who: 'ನೀವು ಯಾರು?', sub: 'ಪ್ರಕರಣ ದಾಖಲಿಸಲು ಅರ್ಜಿದಾರರನ್ನು ಅಥವಾ ಕಾನೂನು ಸಲಹೆಗಾರರನ್ನು ಆಯ್ಕೆಮಾಡಿ.' },
+      ml: { who: 'നിങ്ങൾ ആരാണ്?', sub: 'കേസ് ഫയൽ ചെയ്യാൻ അപേക്ഷകൻ അല്ലെങ്കിൽ നിയമോപദേശകൻ തിരഞ്ഞെടുക്കുക.' },
+      pa: { who: 'ਤੁਸੀਂ ਕੌਣ ਹੋ?', sub: 'ਕੇਸ ਦਰਜ ਕਰਨ ਲਈ ਅਰਜ਼ੀਦਾਤਾ ਜਾਂ ਕਾਨੂੰਨੀ ਸਲਾਹਕਾਰ ਚੁਣੋ।' },
+      or: { who: 'ଆପଣ କିଏ?', sub: 'ମାମଲା ଦାଖଲ କରିବାକୁ ଆବେଦନକାରୀ କିମ୍ବା ଆଇନ ପରାମର୍ଶଦାତା ବାଛନ୍ତୁ।' },
+      as: { who: 'আপুনি কোন?', sub: 'গোচৰ দাখিল কৰিবলৈ আৱেদনকাৰী বা আইনী পৰামৰ্শদাতা বাছনি কৰক।' },
+      ur: { who: 'آپ کون ہیں؟', sub: 'کیس درج کرنے کے لیے درخواست گزار یا قانونی مشیر منتخب کریں۔' }
+    };
+    function applyLang(code) {
+      localStorage.setItem('nyaya_lang', code);
+      const t = I18N[code] || I18N.en;
+      const wt = document.getElementById('auth-who-title'), ws = document.getElementById('auth-who-sub');
+      if (wt) wt.textContent = t.who;
+      if (ws) ws.textContent = t.sub;
+    }
+    const langSel = document.getElementById('lang-select');
+    if (langSel) {
+      langSel.value = localStorage.getItem('nyaya_lang') || 'en';
+      applyLang(langSel.value);
+      langSel.addEventListener('change', e => {
+        applyLang(e.target.value);
+        toast('Language switched to ' + e.target.options[e.target.selectedIndex].text);
+      });
+    }
+
     (async () => {
       await loadCloud();
       const u = curUser();
