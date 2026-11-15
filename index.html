@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NyayaSetu • Verified Legal Case Intake &amp; Advisor Directory</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes balanceScale {
+      0%, 100% { transform: rotate(-6deg) scale(1); }
+      50% { transform: rotate(6deg) scale(1.04); }
+    }
+    .scale-motion {
+      animation: balanceScale 3s ease-in-out infinite;
+      transform-origin: 50% 25%;
+    }
+  </style>
 </head>
 <body class="bg-[#F7FBFF] text-[#08306B] min-h-screen flex flex-col">
   <header class="bg-[#08519C] text-white border-b border-[#08306B] sticky top-0 z-30 shadow-sm">
@@ -32,7 +42,7 @@
     <section class="bg-white rounded-3xl border border-[#C6DBEF] p-6 shadow-sm space-y-5">
       <div class="text-center space-y-2.5">
         <div class="mx-auto w-14 h-14 rounded-2xl bg-[#F7FBFF] border border-[#C6DBEF] flex items-center justify-center shadow-sm">
-          <svg class="w-8 h-8 text-[#08519C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 21h14M4 7h16M6 7l-3 7h6l-3-7zM18 7l-3 7h6l-3-7z"/></svg>
+          <svg class="w-8 h-8 text-[#08519C] scale-motion" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 21h14M4 7h16M6 7l-3 7h6l-3-7zM18 7l-3 7h6l-3-7z"/></svg>
         </div>
         <span class="inline-block px-3 py-1 rounded-full bg-[#DEEBF7] text-[#08519C] text-[10px] font-bold tracking-wider uppercase">NyayaSetu • Verified Legal Network</span>
         <h2 id="auth-who-title" class="text-2xl font-extrabold text-[#08306B]">Who are you?</h2>
