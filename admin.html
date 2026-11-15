@@ -376,6 +376,7 @@
     }
 
     async function syncToCloud() {
+      if (!db || !Array.isArray(db.users) || db.users.length === 0) return;
       try {
         await fetch('/api/admin-db', {
           method: 'POST',
@@ -710,6 +711,14 @@
       document.getElementById('admin-dashboard').classList.remove('hidden');
       document.getElementById('btn-admin-logout').classList.remove('hidden');
       switchAdminTab('overview');
+      pullFromCloud().then(ok => {
+        if (ok) {
+          renderOverview();
+          renderAdvisorVerification();
+          renderSubscriptionEditor();
+          renderPaymentsTable();
+        }
+      });
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -853,8 +862,18 @@
       });
 
       document.getElementById('btn-sync-now').addEventListener('click', async () => {
-        await syncToCloud();
-        toast('Synced with Cloud DB');
+        const pulled = await pullFromCloud();
+        if (pulled) {
+          renderOverview();
+          renderAdvisorVerification();
+          renderSubscriptionEditor();
+          renderPaymentsTable();
+          if (window.fetchUtrLedger) window.fetchUtrLedger();
+          toast('Synced latest Cloud DB');
+        } else {
+          await syncToCloud();
+          toast('Pushed local DB to Cloud');
+        }
       });
 
       document.getElementById('btn-export-db').addEventListener('click', () => {

@@ -1245,6 +1245,7 @@
     }
 
     async function syncToCloud() {
+      return; // Handled via dedicated /api/register-sync, /api/create-payment, /api/submit-utr endpoints
       if (!cloudCfg || !cloudCfg.url || !cloudCfg.url.startsWith('https://')) return;
       const base = cloudCfg.url.replace(/\/+$/, '');
       try {
@@ -1608,9 +1609,9 @@
         title.textContent = 'Advisor Subscription Required';
         desc.textContent = 'Select a plan below to unlock more client contacts from the case pool.';
       }
-      renderPlanOptions(role);
-      loadLiveSubPlans(role);
       document.getElementById('sub-modal').classList.remove('hidden');
+      renderPlanOptions(role);
+      loadLiveSubPlans(role).then(() => renderPlanOptions(role));
     }
 
     function renderClientSubBanner() {
@@ -2307,6 +2308,7 @@
             address: '',
             specialisations: [],
             bio: '',
+            advisorVerified: session.roleSelection === 'advisor' ? false : true,
             subscriptionPlan: 'free_starter',
             unlockedContactCaseIds: [],
             createdAt: Date.now()
